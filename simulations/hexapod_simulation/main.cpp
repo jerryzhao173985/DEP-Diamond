@@ -333,7 +333,8 @@ public:
         pc.n_layers = layers;
         //if(babbling) pc.initModel=false;
         loadParamsintoConf(pc, config_name);
-        // checck if DiamondConf is truly updated: std::cout<< pc.params.l1_epsM << std::endl;
+        // checck if DiamondConf is truly updated: 
+        //std::cout<< pc.params.l1_epsM << std::endl;
 
         Diamond* diamond_controller = new Diamond(pc);
         // diamond_controller ->setParam("epsM",0.001);
@@ -644,7 +645,13 @@ int main (int argc, char **argv)
   if(index) 
     if(argc > index)
       time_period = atoi(argv[index]);
-
+  
+  config_name = "config.txt";
+  index = Simulation::contains(argv, argc, "-config");
+  if(index)
+    if(argc > index)
+      config_name = argv[index];
+  std::cout<< std::endl << config_name << " successfully parsed from the CML!"<< std::endl;
 
   ThisSim sim;
   return sim.run(argc, argv) ? 0 :  1;
