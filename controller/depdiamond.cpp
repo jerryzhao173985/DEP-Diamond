@@ -250,7 +250,7 @@ matrix::Matrix DEPDiamond::getPredictionState(int motor_smooth_time_period) {
   // matrix::Matrix x_hat = (M + 0.01).pseudoInverse() * y ;
   // matrix::Matrix x_hat = (M ^T) * y ;
   matrix::Matrix x_hat = M.mapP(5.0, clip) * x_smooth - y;    // take the prediction error of the action!!
-  std::cout<< x_hat << std::endl;
+  // std::cout<< x_hat << std::endl;
   // or return x_har.sqrt()
   return x_hat * 0.25;   // 0.5
 }

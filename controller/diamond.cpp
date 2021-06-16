@@ -12,6 +12,8 @@ Diamond::Diamond(const DiamondConf& conf)
 {
   t=0;
 
+  // this->conf = conf;
+
 
   //addInspectableMatrix("A", &A, conf.someInternalParams, "model matrix");
   //if(conf.useExtendedModel)
@@ -59,26 +61,28 @@ void Diamond::init(int sensornumber, int motornumber, RandGen* randGen){
     addInspectableMatrix("M"+to_string(i+1), internal_layer[i]->getpM(), false, "inverse model matrix of layer"+to_string(i+1));
     addInspectableMatrix("C"+to_string(i+1), internal_layer[i]->getpC(), false, "controller matrix of layer "+to_string(i+1));
     
-    addInspectableMatrix("L"+to_string(i+1), internal_layer[i]->getpL(), false, "Jacobian matrix of layer"+to_string(i+1));
-    addInspectableMatrix("EvRe"+to_string(i+1), internal_layer[i]->getpEvRe(), false, "Eigenvalue Real Part of layer"+to_string(i+1));
+    // addInspectableMatrix("L"+to_string(i+1), internal_layer[i]->getpL(), false, "Jacobian matrix of layer"+to_string(i+1));
+    // addInspectableMatrix("EvRe"+to_string(i+1), internal_layer[i]->getpEvRe(), false, "Eigenvalue Real Part of layer"+to_string(i+1));
     //addInspectableMatrix("A", &(ol->getA()), conf.someInternalParams, "model matrix");
     //addInspectableMatrix("A", &(oll.getA()), conf.someInternalParams, "model matrix");
   }
 
 
-  internal_layer[0] ->setParam("epsM",0.005);
-  internal_layer[0] ->setParam("epsh",0.000);
-  internal_layer[0] ->setParam("synboost",1.1);   // 1.1~1.5
-  internal_layer[0] ->setParam("urate",0.05);
-  internal_layer[0] ->setParam("indnorm",1); // 0 is global normalization
-  internal_layer[0] ->setParam("timedist",4);
+  internal_layer[0] ->setParam("epsM",conf.params.l1_epsM);
+  internal_layer[0] ->setParam("epsh",conf.params.l1_epsh);
+  internal_layer[0] ->setParam("synboost",conf.params.l1_synboost);   // 1.1~1.5
+  internal_layer[0] ->setParam("urate",conf.params.l1_urate);
+  internal_layer[0] ->setParam("indnorm",conf.params.l1_indnorm); // 0 is global normalization
+  internal_layer[0] ->setParam("timedist",conf.params.l1_timedist);
   
-  internal_layer[1] ->setParam("epsM",0.01);
-  internal_layer[1] ->setParam("epsh",0.000);
-  internal_layer[1] ->setParam("synboost",1.5);   // 1.1~1.5
-  internal_layer[1] ->setParam("urate",0.05);
-  internal_layer[1] ->setParam("indnorm",1); // 0 is global normalization
-  internal_layer[1] ->setParam("timedist",8);
+  internal_layer[1] ->setParam("epsM",conf.params.l2_epsM);
+  internal_layer[1] ->setParam("epsh",conf.params.l2_epsh);
+  internal_layer[1] ->setParam("synboost",conf.params.l2_synboost);   // 1.1~1.5
+  internal_layer[1] ->setParam("urate",conf.params.l2_urate);
+  internal_layer[1] ->setParam("indnorm",conf.params.l2_indnorm); // 0 is global normalization
+  internal_layer[1] ->setParam("timedist",conf.params.l2_timedist);
+
+  //std::cout<< std::endl<< internal_layer[0]->getParam("epsM") << std::endl<< std::endl;
 
 
   //addInspectableMatrix("M", &M, false, "inverse-model matrix");

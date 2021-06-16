@@ -34,12 +34,34 @@
 using namespace matrix;
 using namespace std;
 
+struct All_Params{
+  double l1_epsM;
+  double l1_epsh;
+  double l1_synboost;
+  double l1_urate;
+  int l1_indnorm;
+  int l1_timedist;
+  double l2_epsM;
+  double l2_epsh;
+  double l2_synboost;
+  double l2_urate;
+  int l2_indnorm;
+  int l2_timedist;
+  // internal_layer[0] ->setParam("epsM",0.005);
+  // internal_layer[0] ->setParam("epsh",0.000);
+  // internal_layer[0] ->setParam("synboost",1.1);   // 1.1~1.5
+  // internal_layer[0] ->setParam("urate",0.05);
+  // internal_layer[0] ->setParam("indnorm",1); // 0 is global normalization
+  // internal_layer[0] ->setParam("timedist",4);
+};
+
 /// configuration object for Diamond controller. Use Diamond::getDefaultConf().
 struct DiamondConf {
   int    n_layers;  ///< number of internal layers
   int    time_period;
   string base_controller_name;
   bool someInternalParams;  // < if true only some internal parameters are exported
+  All_Params params;
 };
 
 
@@ -66,6 +88,26 @@ public:
     // should perhaps construct a similar one as above for the sensor sliding(smoothing) window
     conf.base_controller_name = "DEPDiamond";   // or "Sox"
     conf.someInternalParams = true;             // < if true only some internal parameters are exported
+    
+    //initial layer parameter setting which is typically used in diamond.cpp in where they initial every depdiamond vector element
+    All_Params all_params;
+    all_params.l1_epsM = 0.001;
+    all_params.l1_epsh = 0.000;
+    all_params.l1_synboost = 1.5;
+    all_params.l1_urate = 0.05;
+    all_params.l1_indnorm = 1;
+    all_params.l1_timedist = 4;
+
+    all_params.l2_epsM = 0.005;
+    all_params.l2_epsh = 0.001;
+    all_params.l2_synboost = 1.1;
+    all_params.l2_urate = 0.02;
+    all_params.l2_indnorm = 1;
+    all_params.l2_timedist = 8;
+    
+    conf.params = all_params;
+    
+    
     return conf;
   }
 

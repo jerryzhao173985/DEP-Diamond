@@ -1,0 +1,30 @@
+
+  internal_layer[0] ->setParam("epsM",0.001);
+  internal_layer[0] ->setParam("epsh",0.000);
+  internal_layer[0] ->setParam("synboost",1.5);   // 1.1~1.5
+  internal_layer[0] ->setParam("urate",0.05);
+  internal_layer[0] ->setParam("indnorm",1); // 0 is global normalization
+  internal_layer[0] ->setParam("timedist",4);
+  
+  internal_layer[1] ->setParam("epsM",0.005);
+  internal_layer[1] ->setParam("epsh",0.001);
+  internal_layer[1] ->setParam("synboost",1.1);   // 1.1~1.5
+  internal_layer[1] ->setParam("urate",0.02);
+  internal_layer[1] ->setParam("indnorm",1); // 0 is global normalization
+  internal_layer[1] ->setParam("timedist",8);
+
+// new today Wed
+//2: not move at all
+internal_layer[0] ->setParam("epsM",0.001);
+  internal_layer[0] ->setParam("epsh",0.000);
+  internal_layer[0] ->setParam("synboost",1.5);   // 1.1~1.5
+  internal_layer[0] ->setParam("urate",0.05);
+  internal_layer[0] ->setParam("indnorm",1); // 0 is global normalization
+  internal_layer[0] ->setParam("timedist",4);
+  
+  internal_layer[1] ->setParam("epsM",0.005);
+  internal_layer[1] ->setParam("epsh",0.001);
+  internal_layer[1] ->setParam("synboost",1.5);   // 1.1~1.5
+  internal_layer[1] ->setParam("urate",0.01);
+  internal_layer[1] ->setParam("indnorm",1); // 0 is global normalization
+  internal_layer[1] ->setParam("timedist",8);

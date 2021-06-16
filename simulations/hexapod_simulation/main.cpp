@@ -21,6 +21,11 @@
  *
  ***************************************************************************/
 
+#include <iostream>
+//#include <string>
+
+#include <fstream>
+#include <algorithm>
 
 #include <ode_robots/simulation.h>
 
@@ -78,6 +83,8 @@ bool randomctrl=false;
 int time_period;
 int layers;
 
+const char* config_name = "config.txt";
+
 /// Class to wrap a sensor and feed its delayed values.
 class DelaySensor : public Sensor, public Configurable {
 public:
@@ -134,6 +141,75 @@ public:
     setCaption("DEP - DIAMOND (Der et al)");
     //setCaption ("Simulator by Martius et al");
 
+  }
+
+  // notice here pcc should pass (to function) by reference, or the DiamondConf wouldn't update
+  void loadParamsintoConf(DiamondConf &pcc, const char* filename = "config.txt"){
+    //read from config file first || there must be "=" in the config file!!
+    // std::ifstream is RAII, i.e. no need to call close
+    std::ifstream cFile (filename);  //"config.txt"
+    if (cFile.is_open())
+    {
+      std::string line;
+      while(std::getline(cFile, line)){
+        line.erase(std::remove_if(line.begin(), line.end(), ::isspace),line.end());
+        if( line.empty() || line[0] == '#' )
+        {
+            continue;
+        }
+        auto delimiterPos = line.find("=");
+        auto name = line.substr(0, delimiterPos);
+        auto value = line.substr(delimiterPos + 1);
+        
+        if(name=="l1_epsM"){ 
+          pcc.params.l1_epsM = (double) std::stod(value);
+        }else if(name=="l1_epsh"){
+          pcc.params.l1_epsh = (double) std::stod(value);
+        }else if(name=="l1_synboost"){
+          pcc.params.l1_synboost = (double) std::stod(value); 
+        }else if(name=="l1_urate"){
+          pcc.params.l1_urate = (double) std::stod(value);
+        }else if(name== "l1_indnorm"){
+          pcc.params.l1_indnorm = (int) std::stoi(value);
+        }else if(name=="l1_timedist"){
+          pcc.params.l1_timedist = (int) std::stoi(value);
+        }else if(name=="l2_epsM"){
+          pcc.params.l2_epsM = (double) std::stod(value);
+        }else if(name=="l2_epsh"){
+          pcc.params.l2_epsh = (double) std::stod(value);
+        }else if(name=="l2_synboost"){
+          pcc.params.l2_synboost = (double) std::stod(value);
+        }else if(name=="l2_urate"){
+          pcc.params.l2_urate = (double) std::stod(value);
+        }else if(name=="l2_indnorm"){
+          pcc.params.l2_indnorm = (int) std::stoi(value);
+        }else if(name=="l2_timedist"){
+          pcc.params.l2_timedist = (int) std::stoi(value);
+        }else{
+          std::cout<< "some thing in the file cannot be assigned to the simulation controller." <<std::endl;
+        }
+        std::cout << name << " " << value << '\n';
+      }
+    }
+    else 
+    {
+      std::cerr << "Couldn't open config file for reading.\n";
+    }
+
+    // set parameters get from the config file
+    // pcc.params.l1_epsM = ;
+    // pcc.params.l1_epsh = ;
+    // pcc.params.l1_synboost = ;
+    // pcc.params.l1_urate = ;
+    // pcc.params.l1_indnorm = ;
+    // pcc.params.l1_timedist = ;
+
+    // pcc.params.l2_epsM = ;
+    // pcc.params.l2_epsh = ;
+    // pcc.params.l2_synboost = ;
+    // pcc.params.l2_urate = ;
+    // pcc.params.l2_indnorm = ;
+    // pcc.params.l2_timedist = ;
   }
 
   // starting function (executed once at the beginning of the simulation loop)
@@ -256,21 +332,26 @@ public:
         pc.time_period= time_period;
         pc.n_layers = layers;
         //if(babbling) pc.initModel=false;
+        loadParamsintoConf(pc, config_name);
+        // checck if DiamondConf is truly updated: std::cout<< pc.params.l1_epsM << std::endl;
 
         Diamond* diamond_controller = new Diamond(pc);
-        diamond_controller ->setParam("epsM",0.001);
-        diamond_controller ->setParam("epsh",0.01);
-        diamond_controller ->setParam("synboost",0.02);
-        diamond_controller ->setParam("urate",0.05);
-        diamond_controller ->setParam("indnorm",1); // 0 is global normalization
-        diamond_controller ->setParam("timedist",4);
+        // diamond_controller ->setParam("epsM",0.001);
+        // diamond_controller ->setParam("epsh",0.01);
+        // diamond_controller ->setParam("synboost",0.02);
+        // diamond_controller ->setParam("urate",0.05);
+        // diamond_controller ->setParam("indnorm",1); // 0 is global normalization
+        // diamond_controller ->setParam("timedist",4);
+
         //diamond_controller->setParam("epsA",0.1); // model learning rate
         //diamond_controller->setParam("epsC",0.1); // controller learning rate
-        diamond_controller->setParam("regularization", 12);
         //controller->setParam("rootE",3);    // model and contoller learn with square rooted error
-        global.configs.push_back ( diamond_controller );
         //controller->setParam("epsC", epsC); // 0.3
         //controller->setParam("Logarithmic", 0);
+        
+        //diamond_controller->setParam("regularization", 12);
+        
+        global.configs.push_back ( diamond_controller );
         controller = diamond_controller;
 
       }else{
