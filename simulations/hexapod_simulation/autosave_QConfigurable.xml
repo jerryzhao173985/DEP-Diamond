@@ -1,0 +1,237 @@
+<!DOCTYPE ConfigurableStateTypeDefinition>
+<ConfigurableStates>
+ <ConfigurableState name="Diamond_0">
+  <ConfigurableWidget isCollapsed="true" numberOfTilesPerRow="3">
+   <ConfigurableTileWidgets/>
+  </ConfigurableWidget>
+  <Configurable revision="1.0" id="1329854349" name="Diamond" autosaveFunction="1">
+   <!--While in autosave mode, only values, bounds and descriptions of parameters which are differing from their original values are stored.-->
+   <paramvals/>
+   <paramints/>
+   <parambools/>
+  </Configurable>
+ </ConfigurableState>
+ <ConfigurableState name="Hexapod_0_0">
+  <ConfigurableWidget tileWidgetWidth="210" isCollapsed="false" numberOfTilesPerRow="3">
+   <ConfigurableTileWidgets>
+    <ConfigurableTileWidget gridRow="0" gridColumn="0" name="coxaDamp" isVisible="true"/>
+    <ConfigurableTileWidget gridRow="0" gridColumn="1" name="coxaJointLimitH" isVisible="true"/>
+    <ConfigurableTileWidget gridRow="0" gridColumn="2" name="coxaJointLimitV" isVisible="true"/>
+    <ConfigurableTileWidget gridRow="1" gridColumn="0" name="coxaPower" isVisible="true"/>
+    <ConfigurableTileWidget gridRow="1" gridColumn="1" name="coxaSpeed" isVisible="true"/>
+    <ConfigurableTileWidget gridRow="1" gridColumn="2" name="tebiaDamp" isVisible="true"/>
+    <ConfigurableTileWidget gridRow="2" gridColumn="0" name="tebiaJointLimit" isVisible="true"/>
+    <ConfigurableTileWidget gridRow="2" gridColumn="1" name="tebiaOffset" isVisible="true"/>
+    <ConfigurableTileWidget gridRow="2" gridColumn="2" name="tebiaPower" isVisible="true"/>
+   </ConfigurableTileWidgets>
+  </ConfigurableWidget>
+  <Configurable revision="HexaPod 0.9" id="1931288655" name="Hexapod_0" autosaveFunction="1">
+   <!--While in autosave mode, only values, bounds and descriptions of parameters which are differing from their original values are stored.-->
+   <paramvals>
+    <paramval name="coxaDamp"/>
+    <paramval name="coxaJointLimitH"/>
+    <paramval name="coxaJointLimitV"/>
+    <paramval name="coxaPower"/>
+    <paramval name="coxaSpeed"/>
+    <paramval name="tebiaDamp"/>
+    <paramval name="tebiaJointLimit"/>
+    <paramval name="tebiaOffset"/>
+    <paramval name="tebiaPower"/>
+   </paramvals>
+   <paramints/>
+   <parambools/>
+  </Configurable>
+ </ConfigurableState>
+ <ConfigurableState name="Diamond_1">
+  <ConfigurableWidget isCollapsed="false" numberOfTilesPerRow="3">
+   <ConfigurableTileWidgets/>
+  </ConfigurableWidget>
+  <Configurable revision="1.0" id="1329854349" name="Diamond" autosaveFunction="1">
+   <!--While in autosave mode, only values, bounds and descriptions of parameters which are differing from their original values are stored.-->
+   <paramvals/>
+   <paramints/>
+   <parambools/>
+  </Configurable>
+ </ConfigurableState>
+ <ConfigurableState name="Simulation Environment_0">
+  <ConfigurableWidget tileWidgetWidth="210" isCollapsed="false" numberOfTilesPerRow="3">
+   <ConfigurableTileWidgets>
+    <ConfigurableTileWidget gridRow="0" gridColumn="0" name="cameraspeed" isVisible="true"/>
+    <ConfigurableTileWidget gridRow="0" gridColumn="1" name="commandline" isVisible="true"/>
+    <ConfigurableTileWidget gridRow="0" gridColumn="2" name="controlinterval" isVisible="true"/>
+    <ConfigurableTileWidget gridRow="1" gridColumn="0" name="fps" isVisible="true"/>
+    <ConfigurableTileWidget gridRow="1" gridColumn="1" name="gravity" isVisible="true"/>
+    <ConfigurableTileWidget gridRow="1" gridColumn="2" name="logwhilerecording" isVisible="true"/>
+    <ConfigurableTileWidget gridRow="2" gridColumn="0" name="noise" isVisible="true"/>
+    <ConfigurableTileWidget gridRow="2" gridColumn="1" name="randomseed" isVisible="true"/>
+    <ConfigurableTileWidget gridRow="2" gridColumn="2" name="realtimefactor" isVisible="true"/>
+    <ConfigurableTileWidget gridRow="3" gridColumn="0" name="simstepsize" isVisible="true"/>
+   </ConfigurableTileWidgets>
+  </ConfigurableWidget>
+  <Configurable revision="$Id$" id="846930886" name="Simulation Environment" autosaveFunction="1">
+   <!--While in autosave mode, only values, bounds and descriptions of parameters which are differing from their original values are stored.-->
+   <paramvals>
+    <paramval name="cameraspeed"/>
+    <paramval name="fps"/>
+    <paramval name="gravity"/>
+    <paramval name="noise"/>
+    <paramval name="randomseed"/>
+    <paramval name="realtimefactor"/>
+    <paramval name="simstepsize"/>
+   </paramvals>
+   <paramints>
+    <paramint name="controlinterval"/>
+   </paramints>
+   <parambools>
+    <parambool name="commandline"/>
+    <parambool name="logwhilerecording"/>
+   </parambools>
+  </Configurable>
+ </ConfigurableState>
+ <ConfigurableState name="Hexapod_0's Agent_0">
+  <ConfigurableWidget isCollapsed="false" numberOfTilesPerRow="3">
+   <ConfigurableTileWidgets/>
+  </ConfigurableWidget>
+  <Configurable revision="" id="1032603798" name="Hexapod_0's Agent" autosaveFunction="1">
+   <!--While in autosave mode, only values, bounds and descriptions of parameters which are differing from their original values are stored.-->
+   <paramvals/>
+   <paramints/>
+   <parambools/>
+  </Configurable>
+ </ConfigurableState>
+ <ConfigurableState name="LimitOrientationOperator_0">
+  <ConfigurableWidget isCollapsed="false" numberOfTilesPerRow="3">
+   <ConfigurableTileWidgets/>
+  </ConfigurableWidget>
+  <Configurable revision="1.0" id="2068397100" name="LimitOrientationOperator" autosaveFunction="1">
+   <!--While in autosave mode, only values, bounds and descriptions of parameters which are differing from their original values are stored.-->
+   <paramvals/>
+   <paramints/>
+   <parambools/>
+  </Configurable>
+ </ConfigurableState>
+ <ConfigurableState name="lpzrobots-ode_robots_0">
+  <ConfigurableWidget tileWidgetWidth="210" isCollapsed="false" numberOfTilesPerRow="3">
+   <ConfigurableTileWidgets>
+    <ConfigurableTileWidget gridRow="0" gridColumn="0" name="DefaultFPS" isVisible="true"/>
+    <ConfigurableTileWidget gridRow="0" gridColumn="1" name="Shadow" isVisible="true"/>
+    <ConfigurableTileWidget gridRow="0" gridColumn="2" name="ShadowTextureSize" isVisible="true"/>
+    <ConfigurableTileWidget gridRow="1" gridColumn="0" name="UseNVidia" isVisible="true"/>
+    <ConfigurableTileWidget gridRow="1" gridColumn="1" name="UseOdeThread" isVisible="true"/>
+    <ConfigurableTileWidget gridRow="1" gridColumn="2" name="UseOsgThread" isVisible="true"/>
+    <ConfigurableTileWidget gridRow="2" gridColumn="0" name="UseQMPThread" isVisible="true"/>
+    <ConfigurableTileWidget gridRow="2" gridColumn="1" name="WindowHeight" isVisible="true"/>
+    <ConfigurableTileWidget gridRow="2" gridColumn="2" name="WindowWidth" isVisible="true"/>
+    <ConfigurableTileWidget gridRow="3" gridColumn="0" name="inTaskedMode" isVisible="true"/>
+   </ConfigurableTileWidgets>
+  </ConfigurableWidget>
+  <Configurable revision="0.7" id="1804289383" name="lpzrobots-ode_robots" autosaveFunction="1">
+   <!--While in autosave mode, only values, bounds and descriptions of parameters which are differing from their original values are stored.-->
+   <paramvals/>
+   <paramints>
+    <paramint name="DefaultFPS"/>
+    <paramint name="Shadow"/>
+    <paramint name="ShadowTextureSize"/>
+    <paramint name="WindowHeight"/>
+    <paramint name="WindowWidth"/>
+   </paramints>
+   <parambools>
+    <parambool name="UseNVidia"/>
+    <parambool name="UseOdeThread"/>
+    <parambool name="UseOsgThread"/>
+    <parambool name="UseQMPThread"/>
+    <parambool name="inTaskedMode"/>
+   </parambools>
+  </Configurable>
+ </ConfigurableState>
+ <ConfigurableState name="_0">
+  <ConfigurableWidget tileWidgetWidth="210" isCollapsed="false" numberOfTilesPerRow="3">
+   <ConfigurableTileWidgets>
+    <ConfigurableTileWidget gridRow="0" gridColumn="0" name="delay" isVisible="true"/>
+   </ConfigurableTileWidgets>
+  </ConfigurableWidget>
+  <Configurable revision="" id="1769070265" name="" autosaveFunction="1">
+   <!--While in autosave mode, only values, bounds and descriptions of parameters which are differing from their original values are stored.-->
+   <paramvals/>
+   <paramints>
+    <paramint name="delay"/>
+   </paramints>
+   <parambools/>
+  </Configurable>
+ </ConfigurableState>
+ <ConfigurableState name="_1">
+  <ConfigurableWidget tileWidgetWidth="210" isCollapsed="false" numberOfTilesPerRow="3">
+   <ConfigurableTileWidgets>
+    <ConfigurableTileWidget gridRow="0" gridColumn="0" name="delay" isVisible="true"/>
+   </ConfigurableTileWidgets>
+  </ConfigurableWidget>
+  <Configurable revision="" id="154353606" name="" autosaveFunction="1">
+   <!--While in autosave mode, only values, bounds and descriptions of parameters which are differing from their original values are stored.-->
+   <paramvals/>
+   <paramints>
+    <paramint name="delay"/>
+   </paramints>
+   <parambools/>
+  </Configurable>
+ </ConfigurableState>
+ <ConfigurableState name="_2">
+  <ConfigurableWidget tileWidgetWidth="210" isCollapsed="false" numberOfTilesPerRow="3">
+   <ConfigurableTileWidgets>
+    <ConfigurableTileWidget gridRow="0" gridColumn="0" name="delay" isVisible="true"/>
+   </ConfigurableTileWidgets>
+  </ConfigurableWidget>
+  <Configurable revision="" id="192548825" name="" autosaveFunction="1">
+   <!--While in autosave mode, only values, bounds and descriptions of parameters which are differing from their original values are stored.-->
+   <paramvals/>
+   <paramints>
+    <paramint name="delay"/>
+   </paramints>
+   <parambools/>
+  </Configurable>
+ </ConfigurableState>
+ <ConfigurableState name="_3">
+  <ConfigurableWidget tileWidgetWidth="210" isCollapsed="false" numberOfTilesPerRow="3">
+   <ConfigurableTileWidgets>
+    <ConfigurableTileWidget gridRow="0" gridColumn="0" name="delay" isVisible="true"/>
+   </ConfigurableTileWidgets>
+  </ConfigurableWidget>
+  <Configurable revision="" id="457277851" name="" autosaveFunction="1">
+   <!--While in autosave mode, only values, bounds and descriptions of parameters which are differing from their original values are stored.-->
+   <paramvals/>
+   <paramints>
+    <paramint name="delay"/>
+   </paramints>
+   <parambools/>
+  </Configurable>
+ </ConfigurableState>
+ <ConfigurableState name="_4">
+  <ConfigurableWidget tileWidgetWidth="210" isCollapsed="false" numberOfTilesPerRow="3">
+   <ConfigurableTileWidgets>
+    <ConfigurableTileWidget gridRow="0" gridColumn="0" name="delay" isVisible="true"/>
+   </ConfigurableTileWidgets>
+  </ConfigurableWidget>
+  <Configurable revision="" id="2045087982" name="" autosaveFunction="1">
+   <!--While in autosave mode, only values, bounds and descriptions of parameters which are differing from their original values are stored.-->
+   <paramvals/>
+   <paramints>
+    <paramint name="delay"/>
+   </paramints>
+   <parambools/>
+  </Configurable>
+ </ConfigurableState>
+ <ConfigurableState name="_5">
+  <ConfigurableWidget tileWidgetWidth="210" isCollapsed="false" numberOfTilesPerRow="3">
+   <ConfigurableTileWidgets>
+    <ConfigurableTileWidget gridRow="0" gridColumn="0" name="delay" isVisible="true"/>
+   </ConfigurableTileWidgets>
+  </ConfigurableWidget>
+  <Configurable revision="" id="360050294" name="" autosaveFunction="1">
+   <!--While in autosave mode, only values, bounds and descriptions of parameters which are differing from their original values are stored.-->
+   <paramvals/>
+   <paramints>
+    <paramint name="delay"/>
+   </paramints>
+   <parambools/>
+  </Configurable>
+ </ConfigurableState>
+</ConfigurableStates>
