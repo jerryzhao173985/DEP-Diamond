@@ -525,7 +525,7 @@ void DEPDiamond::learnController(){
     break;
   
   case DEPDiamondConf::ADEP: {
-    std::cout << "time_average  " <<time_average <<std::endl;
+    // std::cout << "time_average  " <<time_average <<std::endl;
     // int time_average = 5;
     //std::cout << "Actually using the time-averaging ADEP rule, with time_average=" <<time_average <<std::endl;
     Matrix ch  = x_buffer[t] - x_buffer[t - diff];
