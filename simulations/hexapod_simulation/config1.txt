@@ -1,5 +1,6 @@
 # set all network structure parameters from this config file
-# You can change the learning rule with parameter 'learningrule': 0: DEP, 1: DHL, 2: HL,
+# You can change the learning rule with parameter 'learningrule': 0: DEP, 1: DHL, 2: HL, 
+# MARK: NEW! learningrule = 3: time average vector outer product
 # So with DHL: learningrule=1
 
 # Parameters for Layer 1:

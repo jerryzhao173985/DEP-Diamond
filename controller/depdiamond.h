@@ -38,7 +38,8 @@ struct DEPDiamondConf {
 #define LEARNINGRULES  \
     X(DEP,      "DEP") \
     X(DHL,      "DHL") \
-    X(HL,       "HL")
+    X(HL,       "HL")  \
+    X(ADEP,     "ADEP")
 
   enum LearningRule {
 #define X(Enum, String)       Enum,

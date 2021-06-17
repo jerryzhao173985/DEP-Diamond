@@ -511,7 +511,7 @@ void DEPDiamond::learnController(){
     v = x_buffer[t - timedist] - x_buffer[t - timedist - diff];
     mu = (M * chi);
     break;
-  }
+  } // with the '{}' after 'case', scope of 'chi' ends here
   case DEPDiamondConf::DHL:  ////////////////////////////
     mu  = y_buffer[t -   diff] - y_buffer[t - 2*diff];
     v = x_buffer[t - timedist] - x_buffer[t - timedist - diff];
@@ -520,6 +520,23 @@ void DEPDiamond::learnController(){
     mu = y_buffer[t -   diff];
     v  = x_buffer[t - diff];
     break;
+  
+  case DEPDiamondConf::ADEP: {
+    int time_average = 5;
+    Matrix ch  = x_buffer[t] - x_buffer[t - diff];
+    for(int i=0; i<time_average; i++){
+      ch += (x_buffer[t-i-1] - x_buffer[t - diff-i-1] - ch) * 0.1;
+    }
+
+    v = x_buffer[t - timedist] - x_buffer[t - timedist - diff];
+    for(int i=0; i<time_average; i++){
+      v += (x_buffer[t - timedist-i-1] - x_buffer[t - timedist - diff-i-1] -v) * 0.1;
+    }
+
+    mu = (M * ch);
+    break;
+  } // with the '{}' after 'case', scope of 'ch' ends here
+  
   default:
     cerr << "unkown learning rule!" << endl;
   }
