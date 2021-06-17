@@ -1,11 +1,15 @@
 # set all network structure parameters from this config file
+# You can change the learning rule with parameter 'learningrule': 0: DEP, 1: DHL, 2: HL,
+# So with DHL: learningrule=1
+
 # Parameters for Layer 1:
-l1_epsM = 0.1
+l1_epsM = 0.01
 l1_epsh = 0.000
 l1_synboost = 1.5
 l1_urate = 0.05
 l1_indnorm = 1
 l1_timedist = 4
+l1_learningrule = 0
 
 # Layer 2 Parameters
 l2_epsM = 0.005
@@ -14,4 +18,4 @@ l2_synboost = 1.1
 l2_urate = 0.02
 l2_indnorm = 1 
 l2_timedist = 8
-
+l2_learningrule = 0

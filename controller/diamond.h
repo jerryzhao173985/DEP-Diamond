@@ -1,8 +1,7 @@
 /***************************************************************************
  *                                                                         *
- *
- * author:Simón C. Smith
- * e-mail:artificialsimon@gmail.com
+ * author: Jerry Zhao & Simón C. Smith
+ * e-mail: jerryzhao173985@gmail.com & artificialsimon@gmail.com
  *
  ***************************************************************************/
 
@@ -41,12 +40,15 @@ struct All_Params{
   double l1_urate;
   int l1_indnorm;
   int l1_timedist;
+  int l1_learningrule;
+
   double l2_epsM;
   double l2_epsh;
   double l2_synboost;
   double l2_urate;
   int l2_indnorm;
   int l2_timedist;
+  int l2_learningrule;
   // internal_layer[0] ->setParam("epsM",0.005);
   // internal_layer[0] ->setParam("epsh",0.000);
   // internal_layer[0] ->setParam("synboost",1.1);   // 1.1~1.5
@@ -97,6 +99,7 @@ public:
     all_params.l1_urate = 0.05;
     all_params.l1_indnorm = 1;
     all_params.l1_timedist = 4;
+    all_params.l1_learningrule = 0;
 
     all_params.l2_epsM = 0.005;
     all_params.l2_epsh = 0.001;
@@ -104,6 +107,7 @@ public:
     all_params.l2_urate = 0.02;
     all_params.l2_indnorm = 1;
     all_params.l2_timedist = 8;
+    all_params.l2_learningrule = 0;
     
     conf.params = all_params;
     

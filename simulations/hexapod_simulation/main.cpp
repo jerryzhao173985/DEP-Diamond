@@ -138,7 +138,8 @@ public:
     addColorAliasFile("colors.txt");
     setGroundTexture("Images/whiteground.jpg");
 
-    setCaption("DEP - DIAMOND (Der et al)");
+    setCaption("DEP - DIAMOND                 ");
+    //setCaption("DEP - DIAMOND (Der et al)");
     //setCaption ("Simulator by Martius et al");
 
   }
@@ -185,6 +186,12 @@ public:
           pcc.params.l2_indnorm = (int) std::stoi(value);
         }else if(name=="l2_timedist"){
           pcc.params.l2_timedist = (int) std::stoi(value);
+        
+        }else if(name=="l1_learningrule"){
+          pcc.params.l1_learningrule = (int) std::stoi(value);
+        }else if(name=="l2_learningrule"){
+          pcc.params.l2_learningrule = (int) std::stoi(value);
+        
         }else{
           std::cout<< "some thing in the file cannot be assigned to the simulation controller." <<std::endl;
         }
