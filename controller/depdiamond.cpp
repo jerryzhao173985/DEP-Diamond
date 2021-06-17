@@ -52,6 +52,9 @@ DEPDiamond::DEPDiamond(const DEPDiamondConf& conf)
   addInspectableMatrix("h",  &h, false,   "acting controller bias");
   addInspectableMatrix("C", &C, false, "acting controller matrix");
 
+  // additional parameters for time-averaging ADEP rule for every layer
+  addParameterDef("time_average", &time_average,     1,   0,100, "time-averaging factor for time period in vector outer product in ADEP rule for every layer");
+
 
   if(conf.calcEigenvalues){
     addInspectableMatrix("EvRe", &eigenvaluesLRe, false, "Eigenvalues of L (Re)");
@@ -522,7 +525,9 @@ void DEPDiamond::learnController(){
     break;
   
   case DEPDiamondConf::ADEP: {
-    int time_average = 5;
+    std::cout << "time_average  " <<time_average <<std::endl;
+    // int time_average = 5;
+    //std::cout << "Actually using the time-averaging ADEP rule, with time_average=" <<time_average <<std::endl;
     Matrix ch  = x_buffer[t] - x_buffer[t - diff];
     for(int i=0; i<time_average; i++){
       ch += (x_buffer[t-i-1] - x_buffer[t - diff-i-1] - ch) * 0.1;
@@ -536,7 +541,7 @@ void DEPDiamond::learnController(){
     mu = (M * ch);
     break;
   } // with the '{}' after 'case', scope of 'ch' ends here
-  
+
   default:
     cerr << "unkown learning rule!" << endl;
   }

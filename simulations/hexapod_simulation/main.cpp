@@ -192,6 +192,11 @@ public:
         }else if(name=="l2_learningrule"){
           pcc.params.l2_learningrule = (int) std::stoi(value);
         
+        }else if(name=="l1_time_average"){
+          pcc.params.l1_time_average = (int) std::stoi(value);
+        }else if(name=="l2_time_average"){
+          pcc.params.l2_time_average = (int) std::stoi(value);
+        
         }else{
           std::cout<< "some thing in the file cannot be assigned to the simulation controller." <<std::endl;
         }

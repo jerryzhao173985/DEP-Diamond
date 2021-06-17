@@ -75,6 +75,7 @@ void Diamond::init(int sensornumber, int motornumber, RandGen* randGen){
   internal_layer[0] ->setParam("indnorm",conf.params.l1_indnorm); // 0 is global normalization
   internal_layer[0] ->setParam("timedist",conf.params.l1_timedist);
   internal_layer[0] ->setParam("learningrule",conf.params.l1_learningrule);
+  internal_layer[0] ->setParam("time_average", conf.params.l1_time_average);
   
   internal_layer[1] ->setParam("epsM",conf.params.l2_epsM);
   internal_layer[1] ->setParam("epsh",conf.params.l2_epsh);
@@ -83,6 +84,7 @@ void Diamond::init(int sensornumber, int motornumber, RandGen* randGen){
   internal_layer[1] ->setParam("indnorm",conf.params.l2_indnorm); // 0 is global normalization
   internal_layer[1] ->setParam("timedist",conf.params.l2_timedist);
   internal_layer[1] ->setParam("learningrule",conf.params.l2_learningrule);
+  internal_layer[1] ->setParam("time_average", conf.params.l2_time_average);
 
   //std::cout<< std::endl<< internal_layer[0]->getParam("epsM") << std::endl<< std::endl;
 

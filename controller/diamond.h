@@ -41,6 +41,7 @@ struct All_Params{
   int l1_indnorm;
   int l1_timedist;
   int l1_learningrule;
+  int l1_time_average;
 
   double l2_epsM;
   double l2_epsh;
@@ -49,6 +50,8 @@ struct All_Params{
   int l2_indnorm;
   int l2_timedist;
   int l2_learningrule;
+  int l2_time_average;
+
   // internal_layer[0] ->setParam("epsM",0.005);
   // internal_layer[0] ->setParam("epsh",0.000);
   // internal_layer[0] ->setParam("synboost",1.1);   // 1.1~1.5
@@ -100,6 +103,7 @@ public:
     all_params.l1_indnorm = 1;
     all_params.l1_timedist = 4;
     all_params.l1_learningrule = 0;
+    all_params.l1_time_average = 1;
 
     all_params.l2_epsM = 0.005;
     all_params.l2_epsh = 0.001;
@@ -108,6 +112,7 @@ public:
     all_params.l2_indnorm = 1;
     all_params.l2_timedist = 8;
     all_params.l2_learningrule = 0;
+    all_params.l2_time_average = 1;
     
     conf.params = all_params;
     

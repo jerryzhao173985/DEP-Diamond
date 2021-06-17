@@ -306,7 +306,9 @@ protected:
 
   paramval timedist;
   bool _internWithLearning;    // learning signal available?
-
+  
+  
+  int time_average;
   /// learn  model (M = A^T )  // DEBUG: This oringinal comment should be M = A^(-1)
   virtual void learnModel(double eps);
 
