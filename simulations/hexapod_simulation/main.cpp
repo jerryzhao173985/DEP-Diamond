@@ -53,6 +53,9 @@
 // not include the following for base controller but for another controller for contrast with diamond controller
 #include "../../controller/dep.h"
 
+// #include <stdio.h>
+// #include <string>
+
 
 // fetch all the stuff of lpzrobots into scope
 using namespace lpzrobots;
@@ -82,6 +85,8 @@ bool randomctrl=false;
 
 int time_period;
 int layers;
+
+bool toLog;
 
 const char* config_name = "config.txt";
 
@@ -131,6 +136,11 @@ public:
 
   AbstractController* controller;
   OdeRobot* robot;
+
+  double error;
+  int cover[10][10];
+  bool upside_down;
+  Pos position;
 
   ThisSim(){
     addPaletteFile("colors/UrbanExtraColors.gpl");
@@ -282,6 +292,7 @@ public:
       myHexapodConf.numTarsusSections  = 1;
       myHexapodConf.useTarsusJoints    = true;
       myHexapodConf.legSpreading       = M_PI/10.0;
+      // myHexapodConf.height default is 0.125
 
       OdeHandle rodeHandle = odeHandle;
       rodeHandle.substance.toRubber(20.); // sticky feet
@@ -556,6 +567,112 @@ public:
   }
 
   virtual void addCallback(GlobalData& globalData, bool draw, bool pause, bool control) {
+
+    
+    Position robot_position = robot->getPosition();
+    const int playground = 20;
+    const int bins = 10;
+    double rx = robot_position.x + (playground / 2);
+    double _bin_x = floor(rx / (playground / bins));
+    double ry = robot_position.y + (playground /2);
+    double _bin_y = floor(ry / (playground / bins));
+
+    // if (((fmod(rx, playground / bins) < 0.2) && (bin_x != _bin_x))  ||
+    //     ((fmod(ry, playground / bins) < 0.2) && (bin_y != _bin_y))) {
+    //   bin_x = _bin_x;
+    //   bin_y = _bin_y;
+    //   if (cover[bin_x][bin_y] == 0)
+    //     coverage++;
+    //   cover[bin_x][bin_y]++;
+    //   displacement++;
+    // }      
+
+    // this should be called at the end of the simulation but controller
+    // already dead at ~ThisSim()
+    // double error = 0.0; //controller->getXiAverage();
+    
+    //pp is an orientation matrix for the sensor!
+    Pose pp = robot->getMainPrimitive()->getPose();
+    matrix::Matrix pose3d;
+    pose3d.set(3,3); // change matrix to be a 3x3 matrix
+    for(int ii=0; ii<3; ii++){
+      for(int jj=0; jj<3; jj++){
+        pose3d.val(ii,jj) = pp(ii,jj);
+      }
+    }
+    double angle_x = atan2(pose3d.val(2,1),pose3d.val(2,2));
+    double angle_y = atan2(-pose3d.val(2,0), sqrt(pose3d.val(2,1)*pose3d.val(2,1)+pose3d.val(2,2)*pose3d.val(2,2)));
+    double angle_z = atan2(pose3d.val(1,0), pose3d.val(0,0));
+
+
+    Pos po = robot->getMainPrimitive()->getPosition();
+
+    
+    if(globalData.sim_step%100==0){
+      std::cout <<"( " << angle_x <<" , "<< angle_y << " , "<< angle_z<<")" <<std::endl;
+      //std::cout<< pp(0,0)<< pp(1,1) <<pp(2,2)  << std::endl;
+      // when I print pp(3,3) it is always 1, only the first 3*3 matrix of the pp is very useful;
+      //std::cout <<"pose is: "<<"( " << pp(0,0)<<" , "<< pp(0,1)<<" , "<< pp(0,2) <<")"<< std::endl;
+      //std::cout << "position is: "<<"( " << po.x()<<" , "<< po.y()<<" , "<< po.z() <<")"<< std::endl;
+    }  // initial pose: ( 1 , 0 , 0); initial position: ( 0 , 0 , 1.8) ;
+    
+    //logging out the position and pose txt file for behaviour analysis with '-log'
+    //the first 100 steps are not stable (hexapod are dropped from a high place)
+    if (toLog) {
+      FILE* pFile1;
+      string fileName1 = "position.txt";
+      pFile1 = fopen(fileName1.c_str(), "a");
+      string ss1;
+      ss1 = to_string(globalData.sim_step) 
+          + "\t" + to_string(po.x())
+          + "\t" + to_string(po.y()) 
+          + "\t" + to_string(po.z()); 
+      fprintf(pFile1, "%s\n", ss1.c_str());
+      fclose(pFile1);
+
+      FILE* pFile2;
+      string fileName2 = "pose.txt";
+      pFile2 = fopen(fileName2.c_str(), "a");
+      string ss2;
+      ss2 = to_string(globalData.sim_step) 
+          + "\t" + to_string(pp(0,0))
+          + "\t" + to_string(pp(0,1)) 
+          + "\t" + to_string(pp(0,2)) 
+          + "\t" + to_string(pp(1,0))
+          + "\t" + to_string(pp(1,1)) 
+          + "\t" + to_string(pp(1,2))
+          + "\t" + to_string(pp(2,0))
+          + "\t" + to_string(pp(2,1)) 
+          + "\t" + to_string(pp(2,2)); 
+      fprintf(pFile2, "%s\n", ss2.c_str());
+      fclose(pFile2);
+
+      FILE* pFile3;
+      string fileName3 = "angle.txt";
+      pFile3 = fopen(fileName3.c_str(), "a");
+      string ss3;
+      ss3 = to_string(globalData.sim_step) 
+          + "\t" + to_string(angle_x)
+          + "\t" + to_string(angle_y) 
+          + "\t" + to_string(angle_z); 
+      fprintf(pFile3, "%s\n", ss3.c_str());
+      fclose(pFile3);
+    }
+
+
+    // if (pp(0,2) < -.8) {
+    //   simulation_time_reached = true;
+    //   upside_down = true;
+    // }
+
+    // if ((abs(position.x() - po.x()) < 0.000001) &&
+    //     (abs(position.y() - po.y()) < 0.000001) &&
+    //     (abs(position.z() - po.z()) < 0.000001)) {
+    //   stuckness++;
+    // }
+    // position = po;
+
+    
   }
 
   virtual void bindingDescription(osg::ApplicationUsage & au) const {
@@ -664,6 +781,17 @@ int main (int argc, char **argv)
     if(argc > index)
       config_name = argv[index];
   std::cout<< std::endl << config_name << " successfully parsed from the CML!"<< std::endl;
+
+  toLog = false;
+  toLog    = Simulation::contains(argv,argc,"-log")    != 0;
+  // //logFileName = "";
+  // index = Simulation::contains(argv, argc, "-log");
+  // if (index) {
+  //   if (argc > index) {
+  //      //logFileName = argv[index];
+  //      toLog = true;
+  //    }
+  // }
 
   ThisSim sim;
   return sim.run(argc, argv) ? 0 :  1;

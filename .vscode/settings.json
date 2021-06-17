@@ -1,0 +1,30 @@
+{
+    "files.associations": {
+        "bitset": "cpp",
+        "fstream": "cpp",
+        "ostream": "cpp",
+        "argumentparser": "cpp",
+        "array": "cpp",
+        "billboard": "cpp",
+        "boundingbox": "cpp",
+        "bufferobject": "cpp",
+        "collectoccludersvisitor": "cpp",
+        "geometry": "cpp",
+        "group": "cpp",
+        "lod": "cpp",
+        "nodevisitor": "cpp",
+        "pagedlod": "cpp",
+        "primitiveset": "cpp",
+        "state": "cpp",
+        "switch": "cpp",
+        "view": "cpp",
+        "buffered_value": "cpp",
+        "input": "cpp",
+        "textbase": "cpp",
+        "cullvisitor": "cpp",
+        "intersectionvisitor": "cpp",
+        "viewereventhandlers": "cpp",
+        "matrix": "cpp",
+        "matrixd": "cpp"
+    }
+}
