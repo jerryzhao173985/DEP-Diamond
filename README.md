@@ -103,7 +103,7 @@ Supplementary materials: playfulmachines.com/DEP  (Der et al)
 
 2. using the diamond structure introduced here:
 
-DIAMOND rule: https://www.frontiersin.org/articles/10.3389/fnbot.2020.00062/full
+DIAMOND rule: https://www.frontiersin.org/articles/10.3389/fnbot.2020.00062/full   (Simon et al)
 
 3. Simulator: 
 
