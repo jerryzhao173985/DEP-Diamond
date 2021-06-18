@@ -83,6 +83,8 @@ without the -terrain 1 (mapGen) and also should be with lower stairs(such as 0.1
 ![M1](demos/M1.gif)                  |  ![C1](demos/C1.gif)
 
 
+These two models M1 and M2 are set with identity matrix, with a very small learning rate. However, the second layer model M2 has a relatively larger learning rate because inner model should be adaptablely learnt by itself and fixed by itself.
+
 <br/><br/>
 
 ## Behaviour Evaluations
