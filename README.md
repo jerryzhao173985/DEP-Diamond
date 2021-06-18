@@ -99,7 +99,8 @@ l2_time_average = 2
 1. using the learning rules from the paper 
 
 DEP rule: https://www.pnas.org/content/112/45/E6224
-Supplementary materials: playfulmachines.com/DEP  (Der et al)
+
+Supplementary materials: playfulmachines.com/DEP  (Ralf Der et al)
 
 2. using the diamond structure introduced here:
 
