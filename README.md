@@ -1,5 +1,15 @@
 # DEP-Diamond
 
+## Demo
+
+
+**Variablity of Locomotion Behaviour**     |  **Exploration on another map**
+:------------------------------------:|:-------------------------------------------:
+![demo1](demos/demo1.gif) |  ![demo2](demos/demo2.gif)
+
+
+## Experiments
+
 ```./start -m 5 -diamond -layers 2 -period 2 -g -config config1.txt```
 
 
@@ -98,7 +108,7 @@ These two models M1 and M2 are set with identity matrix, with a very small learn
 
 
 
-## Demo Videos:
+## Videos:
 
 **Behaviour varieties emerge in different trails** with different parameters:
 
@@ -115,7 +125,7 @@ https://youtu.be/9pa87s2gzj0
 
 
 
-## Experiments. All the command line options:
+## Parameters. All the command line options:
 
     --------------- Specific settings for this simulation ------------    
 -walkmodel    initialize model to contain additional connections, see following switches:    

@@ -726,7 +726,8 @@ public:
 
     
     if(globalData.sim_step%100==0){
-      std::cout <<"( " << angle_x <<" , "<< angle_y << " , "<< angle_z<<")" <<std::endl;
+      //std::cout <<"( " << angle_x <<" , "<< angle_y << " , "<< angle_z<<")" <<std::endl;
+      
       //std::cout<< pp(0,0)<< pp(1,1) <<pp(2,2)  << std::endl;
       // when I print pp(3,3) it is always 1, only the first 3*3 matrix of the pp is very useful;
       //std::cout <<"pose is: "<<"( " << pp(0,0)<<" , "<< pp(0,1)<<" , "<< pp(0,2) <<")"<< std::endl;
