@@ -28,6 +28,24 @@ without the -terrain 1 (mapGen) and also should be with lower stairs(such as 0.1
 
 ## Demo pics:
 
+
+**less difficult uneven terrain**     |  **less difficult uneven terrain topdown**
+:------------------------------------:|:-------------------------------------------:
+![less difficult uneven terrain](demos/less_difficult_uneven_terrain.jpg) |  ![less difficult uneven terrain_topdown](demos/less_difficult_uneven_terrain_topdown.jpg)
+
+
+**more difficult uneven terrain**     |  **more difficult uneven terrain topdown**
+:------------------------------------:|:-------------------------------------------:
+![more difficult uneven terrain](demos/more_difficult_uneven_terrain.jpg) |  ![more difficult uneven terrain](demos/more_difficult_uneven_terrain_topdown.jpg)
+
+
+**stairs**     |  **four wheeled flipper robot**
+:------------------------------------:|:-------------------------------------------:
+![stairs](demos/stairs.jpg) |  ![four wheeled flipper robot](demos/four-wheeled_flipper.jpg)
+
+
+<!---
+
 **less difficult uneven terrain**
 
 ![less difficult uneven terrain](demos/less_difficult_uneven_terrain.jpg)
@@ -47,6 +65,8 @@ without the -terrain 1 (mapGen) and also should be with lower stairs(such as 0.1
 **four wheeled flipper robot**
 
 ![four wheeled flipper robot](demos/four-wheeled_flipper.jpg)
+
+-->
 
 
 ## Demo Videos:
