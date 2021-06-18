@@ -25,6 +25,7 @@
         "intersectionvisitor": "cpp",
         "viewereventhandlers": "cpp",
         "matrix": "cpp",
-        "matrixd": "cpp"
+        "matrixd": "cpp",
+        "cmath": "cpp"
     }
 }

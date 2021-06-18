@@ -4,3 +4,46 @@
 
 
 ```./start -set "{synboost=0.1 urate=10.0 epsh=0.1 timedist=4 delay=4}" -m 5 -diamond -layers 2 -period 2 -g -config config1.txt -f 1 ```
+
+```
+./start -m 5 -diamond -layers 2 -period 2 -g -config config1.txt -log -simtime 30 -playground 0.25 -terrain 1 -seed 999 -realtimefactor 2
+
+```
+
+```
+./start -m 5 -diamond -layers 2 -period 2 -g -config config1.txt -log -simtime 30 -playground 0.25 -terrain 1 -seed 999 -realtimefactor 0 -topview
+
+```
+
+All the command line options:
+
+    --------------- Specific settings for this simulation ------------    
+-walkmodel    initialize model to contain additional connections, see following switches:    
+-walkdelay    add connections for leg oscillation    
+-tripod    add connections for full tripod gait    
+-tripod_neg    add only negative connections for subsequent legs for tripod    
+-lateral_neg    add negative connections for lateral leg pairs    
+-leg_delay    add connections to delay subsequent legs on each side    
+          END OF MODEL SWITCHES    
+-babbling STEPS    start with # STEPS in motor babbling mode (robot fixed)    
+-boxpile    add a boxpile to the scene    
+-randomctrl    initialize the C matrix randomly (with urate=0 this is static)    
+    --------------- Misc stuff ------------    
+-numwalls N    add N surrounding walls around robot    
+-track FILENAME    record trajectory of robot into file    
+-loadcontroler FILE     load the controller at startup    
+-height HEIGHT     set initial height of robot    
+-noisecontrol TAU     use noise as motor commands with correlation length 1/TAU     
+-sine    use sine controller    
+-whitenoise    use white noise instead of colored noise for sensor noise (only active if paramter noise!=0)    
+
+    --------------- Jerry's settings ------------    
+-diamond     using the DEP-Diamond model    
+-config FILENAME    config files of all controller layer parameters to load in    
+-layers NUM_of_LAYER     using Number_of_Layer in the diamond model with config detailed parameters    
+-playground BOOL     use the playgruond box area or not    
+-zsize DIFFICULTY     the terrian map difficulty, max height     
+-topview    camera top-down view    
+-realtimefactor SPEED    use using a speed of SPEED(or max with 0) in simulation    
+-period TIME_AVG     time-sliding window(period) for the second layer Time-loop error as input     
+-seed SEED     the terrian map seed for generation with Perlin noise    

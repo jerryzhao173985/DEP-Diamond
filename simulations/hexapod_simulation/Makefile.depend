@@ -226,6 +226,11 @@ main.o: /usr/local/include/selforg/parametrizable.h
 main.o: /usr/local/include/selforg/ringbuffer.h ../../controller/diamond.h
 main.o: ../../controller/depdiamond.h
 main.o: /usr/local/include/selforg/matrixutils.h ../../controller/dep.h
+main.o: ../../utils/mapgen/ppm.h ../../utils/mapgen/PerlinNoise.h
+main.o: /usr/include/gsl/gsl_histogram.h
+main.o: /usr/local/include/ode_robots/terrainground.h
+main.o: /usr/local/include/ode_robots/heightfieldprimitive.h
+main.o: /usr/local/include/ode_robots/osgheightfield.h
 ../../controller/depdiamond.o: ../../controller/depdiamond.h
 ../../controller/depdiamond.o: /usr/local/include/selforg/matrixutils.h
 ../../controller/depdiamond.o: /usr/local/include/selforg/matrix.h
@@ -286,3 +291,5 @@ main.o: /usr/local/include/selforg/matrixutils.h ../../controller/dep.h
 ../../controller/dep.o: /usr/local/include/selforg/ringbuffer.h
 ../../controller/dep.o: /usr/local/include/selforg/matrixutils.h
 ../../controller/dep.o: /usr/local/include/selforg/matrix.h
+../../utils/mapgen/PerlinNoise.o: ../../utils/mapgen/PerlinNoise.h
+../../utils/mapgen/ppm.o: ../../utils/mapgen/ppm.h

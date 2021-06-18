@@ -1,3 +1,12 @@
 help
 list
 save 101 saved-matrix/moving-body.ctrl
+list
+help 101
+contrs
+help
+show
+help show
+show 101
+help contrs
+contrs "contours"

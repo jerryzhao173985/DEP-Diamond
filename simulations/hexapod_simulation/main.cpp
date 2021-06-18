@@ -56,6 +56,14 @@
 // #include <stdio.h>
 // #include <string>
 
+#include <cmath>
+#include "../../utils/mapgen/ppm.h"
+#include "../../utils/mapgen/PerlinNoise.h"
+
+#include <gsl/gsl_histogram.h>
+// create terrain based on the map
+#include <ode_robots/terrainground.h>
+
 
 // fetch all the stuff of lpzrobots into scope
 using namespace lpzrobots;
@@ -83,12 +91,64 @@ int babbling=0;
 double initHeight=1.2;
 bool randomctrl=false;
 
+bool topview=false;
+
 int time_period;
 int layers;
 
 bool toLog;
 
 const char* config_name = "config.txt";
+
+
+double realtimefactor; //changeable speed for simulation graphics for recording images
+
+double zsize;
+int terrain;
+bool playground; // use "playgournd" and terrain map with coonfig option "-zsize" or "-playground" same as previous experiments 
+//Map Generator for Terrain Difficulty
+string map_name = "map.ppm";
+unsigned int seed = 237;
+
+void map_gen(int seed) {
+	// Define the size of the image
+	unsigned int width = 256, height = 256;
+
+	// Create an empty PPM image
+	ppm image(width, height);
+
+	// Create a PerlinNoise object with a random permutation vector generated with seed
+	//unsigned int seed = 237;
+	PerlinNoise pn(seed);
+
+	unsigned int kk = 0;
+	// Visit every pixel of the image and assign a color generated with Perlin noise
+	for(unsigned int i = 0; i < height; ++i) {     // y
+		for(unsigned int j = 0; j < width; ++j) {  // x
+			double x = (double)j/((double)width);
+			double y = (double)i/((double)height);
+
+			// Typical Perlin noise
+			double n = pn.noise(10 * x, 10 * y, 0.8);
+
+			// Wood like structure
+			//n = 20 * pn.noise(x, y, 0.8);
+			//n = n - floor(n);
+
+			// Map the values to the [0, 255] interval, for simplicity we use 
+			// tones of grey
+			image.r[kk] = floor(255 * n);
+			image.g[kk] = floor(255 * n);
+			image.b[kk] = floor(255 * n);
+			kk++;
+		}
+	}
+
+	// Save the image in a binary PPM file
+	image.write(map_name);
+
+}
+
 
 /// Class to wrap a sensor and feed its delayed values.
 class DelaySensor : public Sensor, public Configurable {
@@ -241,6 +301,18 @@ public:
     (Pos(1.6, 4.9945, 3.55472),  Pos(160.39, -25.768, 0));
     setCameraMode(Follow);
 
+    // top view
+    if(topview){
+      setCameraHomePos(Pos(-1.14383, 10.1945, 42.7865),  Pos(179.991, -77.6244, 0));
+      setCameraMode(Static);
+    }
+    //global.odeConfig.noise=0.05;
+    //global.odeConfig.setParam("controlinterval", 1);
+    //in "q learning simulation": global.odeConfig.setParam("controlinterval", 10);
+    //NOTE: Find a best realtimefactor to capture the images-----
+    // In the simulation simply set "-realtimefactor 10" then it is speed =  *10
+    global.odeConfig.setParam("realtimefactor", realtimefactor);    //default/normal spped is 1.0
+
     global.odeConfig.setParam("noise", 0.0);
     global.odeConfig.setParam("controlinterval", 2);
     global.odeConfig.setParam("cameraspeed", 100);
@@ -268,6 +340,43 @@ public:
       playground->setPosition(osg::Vec3(0,0,0)); // playground positionieren und generieren
       global.obstacles.push_back(playground);
     }
+
+    // Playground
+    if (zsize >= .0) {
+      double widthground = 20.;
+      double heightground = 3.0;    //1.5
+      Playground* playground = new Playground(odeHandle, osgHandle,osg::Vec3(widthground, 0.208, heightground));
+      playground->setColor(Color(1., 1., 1., .99));
+      playground->setPosition(osg::Vec3(0, 0, .0));
+      if (terrain == 0) {
+        Substance substance;
+        substance.toRubber(5);
+        playground->setGroundSubstance(substance);
+        global.obstacles.push_back(playground);
+        double xboxes = 18;//19.0;
+        double yboxes = 17;
+        double boxdis = 3.;//.45;//1.6;
+        for (double j = .0; j < xboxes; j++)
+          for(double i = .0; i < yboxes; i++) {
+            double xsize = 1.;//1.0;
+            double ysize = 1.;//.25;
+            PassiveBox* b =
+              new PassiveBox(odeHandle,
+                  osgHandle, osg::Vec3(xsize,ysize,zsize),0.0);
+            b->setPosition(Pos( + boxdis*(i-(xboxes-1)/2.0), + boxdis*(j-(yboxes-1)/2.0), 0.01));
+            global.obstacles.push_back(b);
+          }
+      }
+      if (terrain == 1) {
+        TerrainGround* terrainground =
+          new TerrainGround(odeHandle, osgHandle.changeColor(Color(1.0f,1.0f,1.0f)),
+              map_name, "../../utils/maze256c.ppm",
+              20, 20, zsize, OSGHeightField::Red);
+        terrainground->setPose(osg::Matrix::translate(.0, .0, .11));
+        global.obstacles.push_back(terrainground);
+      }
+    }
+
 
 
     controller=0;
@@ -568,6 +677,14 @@ public:
 
   virtual void addCallback(GlobalData& globalData, bool draw, bool pause, bool control) {
 
+    if(globalData.sim_step==3000){
+      const char* name = "screenshots/";
+      startVideoRecording(name);
+    }
+    if(globalData.sim_step==4000){
+      stopVideoRecording();
+    }
+
     
     Position robot_position = robot->getPosition();
     const int playground = 20;
@@ -711,6 +828,16 @@ public:
     printf("    -noisecontrol TAU \tuse noise as motor commands with correlation length 1/TAU \n");
     printf("    -sine\tuse sine controller\n");
     printf("    -whitenoise\tuse white noise instead of colored noise for sensor noise (only active if paramter noise!=0)\n");
+    printf("  --------------- Jerry's settings ------------\n");
+    printf("    -diamond \tusing the DEP-Diamond model\n");
+    printf("    -config FILENAME\tconfig files of all controller layer parameters to load in\n");
+    printf("    -layers NUM_of_LAYER \tusing Number_of_Layer in the diamond model with config detailed parameters\n");
+    printf("    -playground BOOL \tuse the playgruond box area or not\n");
+    printf("    -zsize DIFFICULTY \tthe terrian map difficulty, max height \n");
+    printf("    -topview\tcamera top-down view\n");
+    printf("    -realtimefactor SPEED\tuse using a speed of SPEED(or max with 0) in simulation\n");
+    printf("    -period TIME_AVG \ttime-sliding window(period) for the second layer Time-loop error as input \n");
+    printf("    -seed SEED \tthe terrian map seed for generation with Perlin noise\n");
   };
 
 };
@@ -792,6 +919,39 @@ int main (int argc, char **argv)
   //      toLog = true;
   //    }
   // }
+
+  topview = false;
+  topview    = Simulation::contains(argv,argc,"-topview")    != 0;
+
+  // Negative values cancel playground
+  zsize = -1.;
+  index = Simulation::contains(argv, argc, "-playground");
+  if(index) 
+    if(argc > index)
+      zsize = atof(argv[index]);
+
+  realtimefactor = 1.;  //default using 1 speed  // 0 is full speed
+  index = Simulation::contains(argv, argc, "-realtimefactor");
+  if(index) 
+    if(argc > index)
+      realtimefactor = atof(argv[index]);
+      
+
+  terrain = 0; // boxes
+  index = Simulation::contains(argv, argc, "-terrain");
+  if(index) 
+    if(argc > index)
+      terrain = atoi(argv[index]);
+
+  seed = 237;
+  index = Simulation::contains(argv, argc, "-seed");
+  if(index) 
+    if(argc > index)
+      seed = atoi(argv[index]);
+  
+  //generate map;
+  std::cout<<"The seed for map generation is: "<< seed << std::endl;
+  map_gen(seed);
 
   ThisSim sim;
   return sim.run(argc, argv) ? 0 :  1;
