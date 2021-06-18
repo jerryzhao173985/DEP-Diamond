@@ -69,7 +69,7 @@ without the -terrain 1 (mapGen) and also should be with lower stairs(such as 0.1
 -->
 
 
-## Evaluations
+## Matrix Evaluations
 
 
 **Second layer model matrix M2**     |  **Second layer controller matrix C2**
@@ -81,6 +81,18 @@ without the -terrain 1 (mapGen) and also should be with lower stairs(such as 0.1
 **First layer model matrix M1**      |  **First layer model matrix C1**
 :-----------------------------------:|:-------------------------------------------:
 ![M1](demos/M1.gif)                  |  ![C1](demos/C1.gif)
+
+
+<br/><br/>
+
+## Behaviour Evaluations
+
+**Correlations and Coverage of Euler angles** (Pitch, yaw, Roll) in 3D space:
+
+
+**intense behaviour correlations**   |  **behaviour change**
+:-----------------------------------:|:-------------------------------------------:
+![2s](demos/2s.gif)                  |  ![normalized](demos/normalized.gif)
 
 
 
