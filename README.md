@@ -15,6 +15,16 @@
 
 ```
 
+### Tasks (Besides complex terrain mapGen)
+
+Climbing up stairs:
+
+```./start -m 5 -diamond -layers 2 -period 2 -g -config config1.txt -log -simtime 30 -playground 0.15 -seed 100 -realtimefactor 0 -topview
+```
+
+without the -terrain 1 (mapGen) and also should be with lower stairs(such as 0.15 in this case)
+
+
 All the command line options:
 
     --------------- Specific settings for this simulation ------------    
