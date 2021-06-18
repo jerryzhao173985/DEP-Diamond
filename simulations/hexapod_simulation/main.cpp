@@ -64,6 +64,9 @@
 // create terrain based on the map
 #include <ode_robots/terrainground.h>
 
+#include <selforg/stl_adds.h>
+#include <sys/stat.h>
+
 
 // fetch all the stuff of lpzrobots into scope
 using namespace lpzrobots;
@@ -97,6 +100,11 @@ int time_period;
 int layers;
 
 bool toLog;
+bool terrain_coverage;
+
+string logFileName;
+double stuckness;
+
 
 const char* config_name = "config.txt";
 
@@ -197,9 +205,8 @@ public:
   AbstractController* controller;
   OdeRobot* robot;
 
-  double error;
+  int bin_x, bin_y, coverage, displacement;
   int cover[10][10];
-  bool upside_down;
   Pos position;
 
   ThisSim(){
@@ -213,6 +220,41 @@ public:
     //setCaption ("Simulator by Martius et al");
 
   }
+
+
+  //~ is the deconstructor, operates at the end of the simulation?
+  ~ThisSim() {
+    stuckness = 100. * stuckness / globalData.sim_step;
+    cout << "stuck percentage: " << stuckness << endl;
+    cout << "terrain coverage log: " << terrain_coverage << endl;
+    if (terrain_coverage) {
+      bool writeHeader;
+      FILE* pFile;
+      string fileName = /*to_string(layers) +*/ "terrain_coverage.txt";
+      string header = "coverage\tzsize\tdisplacement\tseed\ttime_steps\tstuck_percentage";
+      struct stat stFileInfo;
+      if ((stat(fileName.c_str(), &stFileInfo) != 0) && (!header.empty())) 
+        writeHeader = true;
+      else 
+        writeHeader = false;
+      cout << "Log file name: " << fileName << "\n";
+      pFile = fopen(fileName.c_str(), "a");
+      string ss;
+      ss = to_string(coverage)  + "\t" + to_string(zsize) 
+          + "\t" + to_string(displacement) + "\t" + to_string(seed) 
+          + "\t" + to_string(globalData.sim_step) 
+          + "\t" + to_string(stuckness);
+      if (writeHeader) {
+        fprintf(pFile, "%s\n", header.c_str());
+        writeHeader = false;
+      }
+      fprintf(pFile, "%s\n", ss.c_str());
+      fclose(pFile);
+      
+    }
+  }
+
+
 
   // notice here pcc should pass (to function) by reference, or the DiamondConf wouldn't update
   void loadParamsintoConf(DiamondConf &pcc, const char* filename = "config.txt"){
@@ -376,6 +418,16 @@ public:
         global.obstacles.push_back(terrainground);
       }
     }
+
+    //initialize the evaluation metric for terrain coverage:
+    bin_x = 0;
+    bin_y = 0;
+    coverage = 0;
+    displacement = 0;
+    stuckness = .0;
+    for (int i = 0; i < 10; i++)
+      for (int j = 0; j < 10; j++)
+        cover[i][j] = 0;
 
 
 
@@ -686,23 +738,7 @@ public:
     }
 
     
-    Position robot_position = robot->getPosition();
-    const int playground = 20;
-    const int bins = 10;
-    double rx = robot_position.x + (playground / 2);
-    double _bin_x = floor(rx / (playground / bins));
-    double ry = robot_position.y + (playground /2);
-    double _bin_y = floor(ry / (playground / bins));
-
-    // if (((fmod(rx, playground / bins) < 0.2) && (bin_x != _bin_x))  ||
-    //     ((fmod(ry, playground / bins) < 0.2) && (bin_y != _bin_y))) {
-    //   bin_x = _bin_x;
-    //   bin_y = _bin_y;
-    //   if (cover[bin_x][bin_y] == 0)
-    //     coverage++;
-    //   cover[bin_x][bin_y]++;
-    //   displacement++;
-    // }      
+    // Position robot_position = robot->getPosition();
 
     // this should be called at the end of the simulation but controller
     // already dead at ~ThisSim()
@@ -775,6 +811,29 @@ public:
           + "\t" + to_string(angle_z); 
       fprintf(pFile3, "%s\n", ss3.c_str());
       fclose(pFile3);
+    }
+
+
+    // 2D terrain coverage same as Simon's on four-wheeled robot:
+    if (terrain_coverage) {
+      Position robot_position = robot->getPosition();
+      const int playground = 20;
+      const int bins = 10;
+      double rx = robot_position.x + (playground / 2);
+      double _bin_x = floor(rx / (playground / bins));
+      double ry = robot_position.y + (playground /2);
+      double _bin_y = floor(ry / (playground / bins));
+
+      if (((fmod(rx, playground / bins) < 0.2) && (bin_x != _bin_x))  ||
+          ((fmod(ry, playground / bins) < 0.2) && (bin_y != _bin_y))) {
+        bin_x = _bin_x;
+        bin_y = _bin_y;
+        if (cover[bin_x][bin_y] == 0)
+          coverage++;
+        cover[bin_x][bin_y]++;
+        displacement++;
+      }
+
     }
 
 
@@ -920,6 +979,8 @@ int main (int argc, char **argv)
   //      toLog = true;
   //    }
   // }
+  terrain_coverage = false;
+  terrain_coverage    = Simulation::contains(argv,argc,"-terrain_coverage")    != 0;
 
   topview = false;
   topview    = Simulation::contains(argv,argc,"-topview")    != 0;
