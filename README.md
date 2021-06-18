@@ -38,12 +38,47 @@ All the command line options:
 -whitenoise    use white noise instead of colored noise for sensor noise (only active if paramter noise!=0)    
 
     --------------- Jerry's settings ------------    
--diamond     using the DEP-Diamond model    
--config FILENAME    config files of all controller layer parameters to load in    
--layers NUM_of_LAYER     using Number_of_Layer in the diamond model with config detailed parameters    
--playground BOOL     use the playgruond box area or not    
--zsize DIFFICULTY     the terrian map difficulty, max height     
--topview    camera top-down view    
--realtimefactor SPEED    use using a speed of SPEED(or max with 0) in simulation    
--period TIME_AVG     time-sliding window(period) for the second layer Time-loop error as input     
--seed SEED     the terrian map seed for generation with Perlin noise    
+-**diamond**     using the DEP-Diamond model    
+-**config** FILENAME    config files of all controller layer parameters to load in    
+-**layers** NUM_of_LAYER     using Number_of_Layer in the diamond model with config detailed parameters    
+-**playground** BOOL     use the playgruond box area or not    
+-**zsize** DIFFICULTY     the terrian map difficulty, max height     
+-**topview**    camera top-down view    
+-**realtimefactor** SPEED    use using a speed of SPEED(or max with 0) in simulation    
+-**period** TIME_AVG     time-sliding window(period) for the second layer Time-loop error as input     
+-**seed** SEED     the terrian map seed for generation with Perlin noise    
+
+## The structure of the ```config.txt``` file is like this:
+An example is shown [here](./simulations/hexapod_simulation/config1.txt).
+
+You can write any command lines in the config file, the self-designed parse will parse all comands or spaces.
+
+```
+# Parameters for Layer 1:
+l1_epsM = 0.001
+l1_epsh = 0.000
+l1_synboost = 1.1
+l1_urate = 0.05
+l1_indnorm = 1
+l1_timedist = 4
+l1_learningrule = 3
+l1_time_average = 1
+
+# Layer 2 Parameters
+l2_epsM = 0.005
+l2_epsh = 0.000
+l2_synboost = 1.1
+l2_urate = 0.1
+l2_indnorm = 1 
+l2_timedist = 8
+l2_learningrule = 3
+l2_time_average = 2
+```
+
+# Git COMMANDS:
+
+``` git add . ```
+
+```git commit -m "adding changeable terrain map for exploration and adaption in the complex terrain"```
+
+``` git push -u origin main ```
