@@ -25,7 +25,46 @@ Climbing up stairs:
 without the -terrain 1 (mapGen) and also should be with lower stairs(such as 0.15 in this case)
 
 
-All the command line options:
+## Demo pics:
+
+**less difficult uneven terrain**
+
+![less difficult uneven terrain](demos/less_difficult_uneven_terrain.jpg)
+
+**less difficult uneven terrain topdown**
+
+![less difficult uneven terrain_topdown](demos/less_difficult_uneven_terrain_topdown.jpg)
+
+**more difficult uneven terrain**
+
+![more difficult uneven terrain](demos/more_difficult_uneven_terrain.jpg)
+
+**stairs**
+
+![stairs](demos/stairs.jpg)
+
+**four wheeled flipper robot**
+
+![four wheeled flipper robot](demos/four-wheeled_flipper.jpg)
+
+
+## Demo Videos:
+
+**Behaviour varieties emerge in different trails** with different parameters:
+
+https://youtu.be/LsKGFznstgI
+
+In just a single experiments, see the correlations of the **Euler Angles** with the minor generated behaviour changes/adaptance:
+
+https://youtu.be/1zWCGcqoexE
+
+
+Also see my previous simulations on 'flippable' **fourwheeled robot**:
+
+https://www.youtube.com/9pa87s2gzj0
+
+
+## Experiments. All the command line options:
 
     --------------- Specific settings for this simulation ------------    
 -walkmodel    initialize model to contain additional connections, see following switches:    
