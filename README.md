@@ -69,6 +69,21 @@ without the -terrain 1 (mapGen) and also should be with lower stairs(such as 0.1
 -->
 
 
+## Evaluations
+
+
+**Second layer model matrix M2**     |  **Second layer controller matrix C2**
+:-----------------------------------:|:-------------------------------------------:
+![M2](demos/M2.gif)                  |  ![C2](demos/C2.gif)
+
+
+
+**First layer model matrix M1**      |  **First layer model matrix C1**
+:-----------------------------------:|:-------------------------------------------:
+![M1](demos/M1.gif)                  |  ![C1](demos/C1.gif)
+
+
+
 ## Demo Videos:
 
 **Behaviour varieties emerge in different trails** with different parameters:
@@ -82,7 +97,8 @@ https://youtu.be/1zWCGcqoexE
 
 Also see my previous simulations on 'flippable' **fourwheeled robot**:
 
-https://www.youtube.com/9pa87s2gzj0
+https://youtu.be/1zWCGcqoexE
+
 
 
 ## Experiments. All the command line options:
