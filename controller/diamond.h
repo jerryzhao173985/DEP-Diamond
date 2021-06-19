@@ -165,6 +165,13 @@ public:
 
   virtual vector<DEPDiamond*> get_internal_layers(){  return internal_layer; }
 
+  virtual matrix::Matrix get_coverage(){  return coverage; }
+  // virtual matrix::Matrix* getp_coverage(){  return &coverage; }
+  virtual void set_coverage(const matrix::Matrix& _coverage){
+    assert(coverage.getM() == _coverage.getM() && coverage.getN() == _coverage.getN());
+    coverage=_coverage;
+  }
+
 
   /***** TEACHABLE ****/
   virtual void setMotorTeaching(const matrix::Matrix& teaching);
@@ -214,6 +221,8 @@ protected:
 
   int t;
   
+  //parameters passed from the outside (high-order) 'main.cpp' script
+  matrix::Matrix coverage;
 
   paramval epsh;
   paramval epsM;

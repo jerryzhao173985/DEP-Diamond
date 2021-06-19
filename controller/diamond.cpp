@@ -11,6 +11,11 @@ Diamond::Diamond(const DiamondConf& conf)
     conf(conf)
 {
   t=0;
+  
+  //passed from outside ("main.cpp")
+  coverage.set(1,1);
+  coverage.val(0,0) = 0;
+  addInspectableMatrix("coverage", &coverage, false, "terrain coverage with time");
 
   // this->conf = conf;
 
@@ -24,8 +29,6 @@ Diamond::Diamond(const DiamondConf& conf)
   //addInspectableMatrix("b", &b, conf.someInternalParams, "model bias");
   //addInspectableMatrix("M", &M, conf.someInternalParams, "inverse model matrix");
   //addInspectableMatrix("C", &C, conf.someInternalParams, "controller matrix");
-
-
   //addInspectableMatrix("v_avg", &v_avg, "input shift (averaged)");
 
 

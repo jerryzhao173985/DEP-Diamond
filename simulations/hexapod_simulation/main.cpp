@@ -67,6 +67,8 @@
 #include <selforg/stl_adds.h>
 #include <sys/stat.h>
 
+#include <selforg/inspectable.h>
+
 
 // fetch all the stuff of lpzrobots into scope
 using namespace lpzrobots;
@@ -101,6 +103,9 @@ int layers;
 
 bool toLog;
 bool terrain_coverage;
+
+// parameters defined to use at each timestep in addCallBack function (to do a different thing); 
+bool passing_coverage_to_internal_param;
 
 string logFileName;
 double stuckness;
@@ -425,6 +430,10 @@ public:
     bin_x = 0;
     bin_y = 0;
     coverage = 0;
+    // test if I can log out the parameters as a graph curve to the GuiLogger inside this main.cpp file
+    //addInspectableMatrix("coverage", &coverage, false, "terrain coverage with time");
+    //the above is not working because the inspectable can only be internal parameters, thus can only be added inside
+    
     displacement = 0;
     stuckness = .0;
     for (int i = 0; i < 10; i++)
@@ -728,8 +737,20 @@ public:
       printf("Set random controller matrix\n");
     }
   }
-
+  
+  // interestingly, here the param GlobalData is same as the next function param global!1
   virtual void addCallback(GlobalData& globalData, bool draw, bool pause, bool control) {
+
+    if(passing_coverage_to_internal_param){
+      matrix::Matrix param_coverage;
+      param_coverage.set(1,1);
+      param_coverage.val(0,0) = (double) coverage;
+      Diamond* dia = dynamic_cast<Diamond*>(globalData.agents[0]->getController());
+      dia->set_coverage(param_coverage);
+    }
+    if(passing_coverage_to_internal_param)
+      setTitle("Coverage: " + to_string(coverage));
+
 
     // print out the terrain coverage status every 10 minutes to show development of the controller:
     if(globalData.sim_step%((int) 6000*10) == 0){
@@ -1001,6 +1022,9 @@ int main (int argc, char **argv)
   //      toLog = true;
   //    }
   // }
+  passing_coverage_to_internal_param = false;
+  passing_coverage_to_internal_param = Simulation::contains(argv,argc,"-plot_coverage")    != 0;
+
   terrain_coverage = false;
   terrain_coverage    = Simulation::contains(argv,argc,"-terrain_coverage")    != 0;
 
