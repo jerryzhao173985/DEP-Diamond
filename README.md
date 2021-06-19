@@ -5,7 +5,7 @@
 
 **Variablity of Locomotion Behaviour**     |  **Exploration on another map**
 :------------------------------------:|:-------------------------------------------:
-![demo1](demos/demo1.gif) |  ![demo2](demos/demo2.gif)
+[![demo1](demos/demo1.gif)](https://youtu.be/mzOExz9ZQ1Y) |  [![demo2](demos/demo2.gif)](https://youtu.be/O-f0Nj2gzkk)
 
 
 ## Experiments

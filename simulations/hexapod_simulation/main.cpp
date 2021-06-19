@@ -227,6 +227,8 @@ public:
     stuckness = 100. * stuckness / globalData.sim_step;
     cout << "stuck percentage: " << stuckness << endl;
     cout << "terrain coverage log: " << terrain_coverage << endl;
+    cout << "Final coverage achieved: " << coverage << endl;
+    // log the terrain data and map seed data to the file "terrain_coverage.txt"
     if (terrain_coverage) {
       bool writeHeader;
       FILE* pFile;
@@ -729,6 +731,12 @@ public:
 
   virtual void addCallback(GlobalData& globalData, bool draw, bool pause, bool control) {
 
+    // print out the terrain coverage status every 10 minutes to show development of the controller:
+    if(globalData.sim_step%((int) 6000*10) == 0){
+      int t_cover = coverage;
+      std::cout <<"Coverage over " << globalData.sim_step/6000 << " minutes is: "<< t_cover  << std::endl;
+    }
+
     if(globalData.sim_step==3000){
       const char* name = "screenshots/";
       startVideoRecording(name);
@@ -863,7 +871,21 @@ public:
       case 'm' : // set model
         setModel(global.agents[0]);
         break;
+      
+      case 'p' :  // print out the model matrix (or the controller matrix) for every layer
+        Diamond* diamond = dynamic_cast<Diamond*>(global.agents[0]->getController());
+        
+        Matrix M1 = diamond->get_internal_layers()[0]->getM();
+        Matrix M2 = diamond->get_internal_layers()[1]->getM();
+        
+        std::cout << "M1: "<< std::endl << M1 << std::endl;
+        std::cout << "M2: "<< std::endl << M1 << std::endl;
+        break;
+      
+      
       }
+        
+    
     }
     return false;
   };

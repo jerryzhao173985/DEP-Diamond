@@ -163,6 +163,8 @@ public:
     C_update=_C;
   }
 
+  virtual vector<DEPDiamond*> get_internal_layers(){  return internal_layer; }
+
 
   /***** TEACHABLE ****/
   virtual void setMotorTeaching(const matrix::Matrix& teaching);
