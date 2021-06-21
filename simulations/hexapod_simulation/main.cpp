@@ -21,6 +21,29 @@
  *
  ***************************************************************************/
 
+// For colored output with std::cout at the command line
+#define RESET   "\033[0m"
+#define BLACK   "\033[30m"      /* Black */
+#define RED     "\033[31m"      /* Red */
+#define GREEN   "\033[32m"      /* Green */
+#define YELLOW  "\033[33m"      /* Yellow */
+#define BLUE    "\033[34m"      /* Blue */
+#define MAGENTA "\033[35m"      /* Magenta */
+#define CYAN    "\033[36m"      /* Cyan */
+#define WHITE   "\033[37m"      /* White */
+#define BOLDBLACK   "\033[1m\033[30m"      /* Bold Black */
+#define BOLDRED     "\033[1m\033[31m"      /* Bold Red */
+#define BOLDGREEN   "\033[1m\033[32m"      /* Bold Green */
+#define BOLDYELLOW  "\033[1m\033[33m"      /* Bold Yellow */
+#define BOLDBLUE    "\033[1m\033[34m"      /* Bold Blue */
+#define BOLDMAGENTA "\033[1m\033[35m"      /* Bold Magenta */
+#define BOLDCYAN    "\033[1m\033[36m"      /* Bold Cyan */
+#define BOLDWHITE   "\033[1m\033[37m"      /* Bold White */
+
+//color code example: std::cout << RED << "hello world" << RESET << std::endl;
+
+
+
 #include <iostream>
 //#include <string>
 
@@ -62,12 +85,16 @@
 
 #include <gsl/gsl_histogram.h>
 // create terrain based on the map
-#include <ode_robots/terrainground.h>
+// #include <ode_robots/terrainground.h>
+//using own modified version of terrainground.h
+#include "terrainground.h"
 
 #include <selforg/stl_adds.h>
 #include <sys/stat.h>
 
 #include <selforg/inspectable.h>
+
+#include <vector>
 
 
 // fetch all the stuff of lpzrobots into scope
@@ -214,6 +241,8 @@ public:
   int cover[10][10];
   Pos position;
 
+  std::vector<int> period_of_coverage;
+
   ThisSim(){
     addPaletteFile("colors/UrbanExtraColors.gpl");
     addColorAliasFile("colors/UrbanColorSchema.txt");
@@ -232,13 +261,13 @@ public:
     stuckness = 100. * stuckness / globalData.sim_step;
     cout << "stuck percentage: " << stuckness << endl;
     cout << "terrain coverage log: " << terrain_coverage << endl;
-    cout << "Final coverage achieved: " << coverage << endl;
+    cout << RED<<"Final coverage achieved: " << coverage <<RESET<< endl;
     // log the terrain data and map seed data to the file "terrain_coverage.txt"
     if (terrain_coverage) {
       bool writeHeader;
       FILE* pFile;
       string fileName = /*to_string(layers) +*/ "terrain_coverage.txt";
-      string header = "coverage\tzsize\tdisplacement\tseed\ttime_steps\tstuck_percentage";
+      string header = "coverage\tzsize\tdisplacement\tseed\ttime_steps\tstuck_percentage\tentropy\tperiod_coverage";
       struct stat stFileInfo;
       if ((stat(fileName.c_str(), &stFileInfo) != 0) && (!header.empty())) 
         writeHeader = true;
@@ -247,10 +276,26 @@ public:
       cout << "Log file name: " << fileName << "\n";
       pFile = fopen(fileName.c_str(), "a");
       string ss;
+      double coverage_entropy = 0.0;
+      for (int i=0; i<10; i++){
+        for (int j=0; j<10; j++){
+          double prob = (double) cover[i][j] / (double) 180000;
+          if(cover[i][j]!=0)
+            coverage_entropy += - prob * log(prob);
+        }
+      }  // entropy based on the robot position x,y with respect to the map for behaviour diversity
       ss = to_string(coverage)  + "\t" + to_string(zsize) 
           + "\t" + to_string(displacement) + "\t" + to_string(seed) 
           + "\t" + to_string(globalData.sim_step) 
-          + "\t" + to_string(stuckness);
+          + "\t" + to_string(stuckness)
+          + "\t" + to_string(coverage_entropy);
+      
+      ss += "\t(";
+      for(std::vector<int>::const_iterator i = period_of_coverage.begin(); i != period_of_coverage.end(); ++i) {
+        ss += to_string(*i) + " , ";
+      }
+      ss += to_string(coverage)+")";
+      //ss += "\t" + to_string();
       if (writeHeader) {
         fprintf(pFile, "%s\n", header.c_str());
         writeHeader = false;
@@ -741,6 +786,45 @@ public:
   // interestingly, here the param GlobalData is same as the next function param global!1
   virtual void addCallback(GlobalData& globalData, bool draw, bool pause, bool control) {
 
+    //try to use this HUBmanager for screen UI manipulation (add parameters to show)
+    //this->getHUDSM()
+    // Collision Handling to test which gait is in:
+    // Basically of the dix feet which foot is on the floor:
+    
+    //collision of foot to the ground detection to determine which gait, 
+    // FIXME: NOW WORKING instead of the enviornment/terrain obstacles crash!
+    // std::cout<<BOLDBLUE<< robot->getAllPrimitives().size() << RESET<< std::endl; //==23
+    dGeomID enviornment_ID = globalData.obstacles[0]->getMainPrimitive()->getGeom();
+    dGeomID foot1_ID = robot->getAllPrimitives()[3]->getGeom();
+    dGeomID foot2_ID = robot->getAllPrimitives()[6]->getGeom();
+    dGeomID foot3_ID = robot->getAllPrimitives()[9]->getGeom();
+    dGeomID foot4_ID = robot->getAllPrimitives()[12]->getGeom();
+    dGeomID foot5_ID = robot->getAllPrimitives()[15]->getGeom();
+    dGeomID foot6_ID = robot->getAllPrimitives()[18]->getGeom();
+    // //std::cout << BOLDBLUE << enviornment_ID << RESET <<std::endl;
+    // int collision;
+    const int N = 10;
+    dContact contact1[N];
+    dContact contact2[N];
+    dContact contact3[N];
+    dContact contact4[N];
+    dContact contact5[N];
+    dContact contact6[N];
+
+    int collision1 = dCollide (enviornment_ID, foot1_ID,N,&contact1[0].geom,sizeof(dContact));
+    int collision2 = dCollide (enviornment_ID, foot2_ID,N,&contact2[0].geom,sizeof(dContact));
+    int collision3 = dCollide (enviornment_ID, foot3_ID,N,&contact3[0].geom,sizeof(dContact));
+    int collision4 = dCollide (enviornment_ID, foot4_ID,N,&contact4[0].geom,sizeof(dContact));
+    int collision5 = dCollide (enviornment_ID, foot5_ID,N,&contact5[0].geom,sizeof(dContact));
+    int collision6 = dCollide (enviornment_ID, foot6_ID,N,&contact6[0].geom,sizeof(dContact));
+    std::cout<< "(" << collision1<<" , "<< collision2<<" , "<< collision3<<" , "<< collision4<<" , "<< collision5<<" , "<< collision6<<")" << std::endl;
+
+    // LOG: Assertion `globalData.obstacles[0]->getMainPrimitive()!=NULL' failed.
+    // std::cout <<  globalData.obstacles.size() <<std::endl;
+    // std::cout << ((Primitive*) globalData.obstacles[0])->getPosition().x() << std::endl;
+    // assert((TerrainGround*) globalData.obstacles[0] != NULL);
+
+
     if(passing_coverage_to_internal_param){
       matrix::Matrix param_coverage;
       param_coverage.set(1,1);
@@ -752,19 +836,21 @@ public:
       setTitle("Coverage: " + to_string(coverage));
 
 
-    // print out the terrain coverage status every 10 minutes to show development of the controller:
-    if(globalData.sim_step%((int) 6000*10) == 0){
+    // print out the terrain coverage status every 5 minutes to show development of the controller:
+    if(globalData.sim_step%((int) 6000*5) == 0){
       int t_cover = coverage;
-      std::cout <<"Coverage over " << globalData.sim_step/6000 << " minutes is: "<< t_cover  << std::endl;
+      std::cout <<YELLOW<<"Coverage over " << globalData.sim_step/6000 << " minutes is: "<< t_cover  <<RESET<< std::endl;
+      period_of_coverage.push_back(t_cover);
     }
 
-    if(globalData.sim_step==3000){
-      const char* name = "screenshots/";
-      startVideoRecording(name);
-    }
-    if(globalData.sim_step==4000){
-      stopVideoRecording();
-    }
+    // Screenshot some pictures for 30-40s!! To check if the robot move at all!
+    // if(globalData.sim_step==3000){
+    //   const char* name = "screenshots/";
+    //   startVideoRecording(name);
+    // }
+    // if(globalData.sim_step==4000){
+    //   stopVideoRecording();
+    // }
 
     
     // Position robot_position = robot->getPosition();

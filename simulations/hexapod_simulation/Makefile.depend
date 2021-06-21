@@ -227,10 +227,10 @@ main.o: /usr/local/include/selforg/ringbuffer.h ../../controller/diamond.h
 main.o: ../../controller/depdiamond.h
 main.o: /usr/local/include/selforg/matrixutils.h ../../controller/dep.h
 main.o: ../../utils/mapgen/ppm.h ../../utils/mapgen/PerlinNoise.h
-main.o: /usr/include/gsl/gsl_histogram.h
-main.o: /usr/local/include/ode_robots/terrainground.h
+main.o: /usr/include/gsl/gsl_histogram.h terrainground.h
 main.o: /usr/local/include/ode_robots/heightfieldprimitive.h
 main.o: /usr/local/include/ode_robots/osgheightfield.h
+main.o: /usr/local/include/ode_robots/abstractobstacle.h
 ../../controller/depdiamond.o: ../../controller/depdiamond.h
 ../../controller/depdiamond.o: /usr/local/include/selforg/matrixutils.h
 ../../controller/depdiamond.o: /usr/local/include/selforg/matrix.h
@@ -291,5 +291,120 @@ main.o: /usr/local/include/ode_robots/osgheightfield.h
 ../../controller/dep.o: /usr/local/include/selforg/ringbuffer.h
 ../../controller/dep.o: /usr/local/include/selforg/matrixutils.h
 ../../controller/dep.o: /usr/local/include/selforg/matrix.h
+terrainground.o: /usr/include/stdio.h /usr/include/features.h
+terrainground.o: /usr/include/stdc-predef.h /usr/include/libio.h
+terrainground.o: /usr/include/_G_config.h /usr/include/wchar.h
+terrainground.o: /usr/include/osgDB/ReadFile /usr/include/osg/Node
+terrainground.o: /usr/include/osg/Object /usr/include/osg/Referenced
+terrainground.o: /usr/include/osg/Export /usr/include/osg/Config
+terrainground.o: /usr/include/OpenThreads/ScopedLock
+terrainground.o: /usr/include/OpenThreads/Mutex
+terrainground.o: /usr/include/OpenThreads/Exports
+terrainground.o: /usr/include/OpenThreads/Config
+terrainground.o: /usr/include/OpenThreads/Atomic /usr/include/osg/CopyOp
+terrainground.o: /usr/include/osg/ref_ptr /usr/include/osg/Notify
+terrainground.o: /usr/include/osg/StateSet /usr/include/osg/StateAttribute
+terrainground.o: /usr/include/osg/StateAttributeCallback
+terrainground.o: /usr/include/osg/Shader /usr/include/osg/GL2Extensions
+terrainground.o: /usr/include/osg/GL /usr/include/GL/gl.h
+terrainground.o: /usr/include/GL/glext.h /usr/include/inttypes.h
+terrainground.o: /usr/include/stdint.h /usr/include/osg/buffered_value
+terrainground.o: /usr/include/osg/DisplaySettings /usr/include/osg/Matrixd
+terrainground.o: /usr/include/osg/Vec3d /usr/include/osg/Vec2d
+terrainground.o: /usr/include/osg/Vec2f /usr/include/osg/Math
+terrainground.o: /usr/include/osg/Vec3f /usr/include/osg/Vec4d
+terrainground.o: /usr/include/osg/Vec4f /usr/include/osg/Quat
+terrainground.o: /usr/include/osg/Uniform /usr/include/osg/Array
+terrainground.o: /usr/include/osg/MixinVector /usr/include/osg/Vec2b
+terrainground.o: /usr/include/osg/Vec3b /usr/include/osg/Vec4b
+terrainground.o: /usr/include/osg/Vec2s /usr/include/osg/Vec3s
+terrainground.o: /usr/include/osg/Vec4s /usr/include/osg/Vec2i
+terrainground.o: /usr/include/osg/Vec3i /usr/include/osg/Vec4i
+terrainground.o: /usr/include/osg/Vec2ub /usr/include/osg/Vec3ub
+terrainground.o: /usr/include/osg/Vec4ub /usr/include/osg/Vec3
+terrainground.o: /usr/include/osg/Vec2us /usr/include/osg/Vec3us
+terrainground.o: /usr/include/osg/Vec4us /usr/include/osg/Vec2ui
+terrainground.o: /usr/include/osg/Vec3ui /usr/include/osg/Vec4ui
+terrainground.o: /usr/include/osg/Vec2 /usr/include/osg/Vec4
+terrainground.o: /usr/include/osg/Matrix /usr/include/osg/Matrixf
+terrainground.o: /usr/include/osg/BufferObject /usr/include/osg/FrameStamp
+terrainground.o: /usr/include/string.h /usr/include/xlocale.h
+terrainground.o: /usr/include/osg/BoundingSphere
+terrainground.o: /usr/include/osg/NodeCallback /usr/include/osg/Image
+terrainground.o: /usr/include/osg/ArgumentParser
+terrainground.o: /usr/include/osg/ApplicationUsage /usr/include/osgDB/Export
+terrainground.o: /usr/include/osgDB/Registry
+terrainground.o: /usr/include/OpenThreads/ReentrantMutex
+terrainground.o: /usr/include/OpenThreads/Thread /usr/include/osg/KdTree
+terrainground.o: /usr/include/osg/Shape /usr/include/osg/Plane
+terrainground.o: /usr/include/osg/BoundingBox /usr/include/osg/Geometry
+terrainground.o: /usr/include/osg/Drawable /usr/include/osg/PrimitiveSet
+terrainground.o: /usr/include/osg/RenderInfo /usr/include/osg/State
+terrainground.o: /usr/include/osg/Observer /usr/include/osg/Timer
+terrainground.o: /usr/include/osg/ShaderComposer /usr/include/osg/Program
+terrainground.o: /usr/include/osg/Polytope /usr/include/osg/fast_back_stack
+terrainground.o: /usr/include/osg/Viewport /usr/include/osg/GLBeginEndAdapter
+terrainground.o: /usr/include/osg/ArrayDispatchers
+terrainground.o: /usr/include/osg/GraphicsCostEstimator /usr/include/osg/View
+terrainground.o: /usr/include/osg/Camera /usr/include/osg/Transform
+terrainground.o: /usr/include/osg/Group /usr/include/osg/NodeVisitor
+terrainground.o: /usr/include/osg/ColorMask /usr/include/osg/CullSettings
+terrainground.o: /usr/include/osg/ClearNode /usr/include/osg/Texture
+terrainground.o: /usr/include/osg/GraphicsContext
+terrainground.o: /usr/include/osg/GraphicsThread
+terrainground.o: /usr/include/osg/OperationThread
+terrainground.o: /usr/include/osg/observer_ptr
+terrainground.o: /usr/include/OpenThreads/Barrier
+terrainground.o: /usr/include/OpenThreads/Condition
+terrainground.o: /usr/include/OpenThreads/Block /usr/include/osg/Stats
+terrainground.o: /usr/include/osg/Light /usr/include/osgDB/DynamicLibrary
+terrainground.o: /usr/include/osgDB/ReaderWriter
+terrainground.o: /usr/include/osgDB/AuthenticationMap
+terrainground.o: /usr/include/osgDB/Options /usr/include/osgDB/Callbacks
+terrainground.o: /usr/include/osgDB/FileCache
+terrainground.o: /usr/include/osgDB/DatabaseRevisions
+terrainground.o: /usr/include/osg/ObserverNodePath
+terrainground.o: /usr/include/osgDB/DotOsgWrapper /usr/include/osgDB/Input
+terrainground.o: /usr/include/osgDB/Output /usr/include/osgDB/fstream
+terrainground.o: /usr/include/osgDB/ObjectWrapper
+terrainground.o: /usr/include/osgDB/Serializer /usr/include/osgDB/InputStream
+terrainground.o: /usr/include/osg/Endian /usr/include/osgDB/StreamOperator
+terrainground.o: /usr/include/osgDB/DataTypes /usr/include/osgDB/OutputStream
+terrainground.o: /usr/include/limits.h /usr/include/limits.h
+terrainground.o: /usr/include/osgDB/SharedStateManager /usr/include/osg/Geode
+terrainground.o: /usr/include/osgDB/ImageProcessor terrainground.h
+terrainground.o: /usr/local/include/ode_robots/heightfieldprimitive.h
+terrainground.o: /usr/local/include/ode_robots/primitive.h
+terrainground.o: /usr/local/include/ode-dbl/common.h
+terrainground.o: /usr/local/include/ode-dbl/odeconfig.h /usr/include/stdlib.h
+terrainground.o: /usr/include/alloca.h /usr/include/math.h
+terrainground.o: /usr/local/include/ode-dbl/error.h
+terrainground.o: /usr/local/include/selforg/storeable.h
+terrainground.o: /usr/local/include/ode_robots/pos.h
+terrainground.o: /usr/local/include/ode-dbl/ode.h
+terrainground.o: /usr/local/include/ode-dbl/compatibility.h
+terrainground.o: /usr/local/include/ode-dbl/odeinit.h
+terrainground.o: /usr/local/include/ode-dbl/contact.h
+terrainground.o: /usr/local/include/ode-dbl/memory.h
+terrainground.o: /usr/local/include/ode-dbl/odemath.h
+terrainground.o: /usr/local/include/ode-dbl/matrix.h
+terrainground.o: /usr/local/include/ode-dbl/timer.h
+terrainground.o: /usr/local/include/ode-dbl/rotation.h
+terrainground.o: /usr/local/include/ode-dbl/mass.h
+terrainground.o: /usr/local/include/ode-dbl/misc.h
+terrainground.o: /usr/local/include/ode-dbl/objects.h
+terrainground.o: /usr/local/include/ode-dbl/odecpp.h
+terrainground.o: /usr/local/include/ode-dbl/collision_space.h
+terrainground.o: /usr/local/include/ode-dbl/collision.h
+terrainground.o: /usr/local/include/ode-dbl/collision_trimesh.h
+terrainground.o: /usr/local/include/ode-dbl/odecpp_collision.h
+terrainground.o: /usr/local/include/ode-dbl/export-dif.h
+terrainground.o: /usr/local/include/selforg/position.h
+terrainground.o: /usr/local/include/ode_robots/pose.h
+terrainground.o: /usr/local/include/ode_robots/substance.h
+terrainground.o: /usr/local/include/ode_robots/osgforwarddecl.h
+terrainground.o: /usr/local/include/ode_robots/osgheightfield.h
+terrainground.o: /usr/local/include/ode_robots/osgprimitive.h
+terrainground.o: /usr/local/include/ode_robots/abstractobstacle.h
 ../../utils/mapgen/PerlinNoise.o: ../../utils/mapgen/PerlinNoise.h
 ../../utils/mapgen/ppm.o: ../../utils/mapgen/ppm.h
