@@ -52,6 +52,8 @@ DEPDiamond::DEPDiamond(const DEPDiamondConf& conf)
   addInspectableMatrix("h",  &h, false,   "acting controller bias");
   addInspectableMatrix("C", &C, false, "acting controller matrix");
 
+  addInspectableMatrix("C_avg", &C_avg, false, "6*6 average of C feet controller matrix");
+
   // additional parameters for time-averaging ADEP rule for every layer
   addParameterDef("time_average", &time_average,     1,   0,100, "time-averaging factor for time period in vector outer product in ADEP rule for every layer");
 
@@ -96,7 +98,9 @@ void DEPDiamond::init(int sensornumber, int motornumber, RandGen* randGen){
   normmot.set(number_motors, 1);
 
   L.set(number_sensors, number_sensors);
-
+  
+  C_avg.set((int) (number_motors/3), (int) (number_sensors/3));
+  
   if(conf.initModel){
     // special model initialization for delay sensor
     //  (two ID matrices besides each other)
@@ -111,6 +115,8 @@ void DEPDiamond::init(int sensornumber, int motornumber, RandGen* randGen){
   C_update.toId();
   C_update*=conf.initFeedbackStrength;
 
+  C_avg.toId();
+
   x_smooth.set(number_sensors,1);
   //y_smooth.set(number_motors,1);
 
@@ -118,6 +124,7 @@ void DEPDiamond::init(int sensornumber, int motornumber, RandGen* randGen){
   y_buffer.init(buffersize, Matrix(number_motors,1));
 
   y_teaching.set(number_motors, 1);
+
 }
 
 
@@ -244,7 +251,7 @@ matrix::Matrix DEPDiamond::getPredictionState(int motor_smooth_time_period) {
   //matrix::Matrix y_smoothed_over_time_period_for_inner_layer = yt;
   matrix::Matrix y = yt;
   for(int i=0; i<motor_smooth_time_period; i++){
-    y += ( y_buffer[(t-1-i)%buffersize] - y) * 0.05;   //0.02
+    y += ( y_buffer[(t-1-i)%buffersize] - y) * 0.1;   //0.02
   }
   
   // matrix::Matrix M_prime = M;
@@ -255,7 +262,7 @@ matrix::Matrix DEPDiamond::getPredictionState(int motor_smooth_time_period) {
   matrix::Matrix x_hat = M.mapP(5.0, clip) * x_smooth - y;    // take the prediction error of the action!!
   // std::cout<< x_hat << std::endl;
   // or return x_har.sqrt()
-  return x_hat * 0.25;   // 0.5
+  return x_hat * 0.5;   // or 0.25?
 }
 // sensor* DEPDiamond::getPredictionState() {
 //   /** Call it after step() */
@@ -480,12 +487,13 @@ void DEPDiamond::stepNoLearningMV(const sensor* x_, int number_sensors_robot,
   // Matrix y =   (C*(x_smooth + (v_avg*creativity)) + h).map(g);
   // TODO: change this! calculate controller values based on current input values (smoothed)
   Matrix y =   (C*(
-                   x_smooth * 0.85 +  // (v_avg*creativity) + // x_0
+                   x_smooth /* * 0.85 */ +  // (v_avg*creativity) + // x_0
                    ((C.pseudoInverse())*((dep_l1->getLastMotorValues()).map(g_inv) -h)) * 0.15 // x^tilde_1
+                  //  ( (dep_l1->getM()).pseudoInverse() * (dep_l1->getLastMotorValues()) ) *0.15  // time-loop error
                   )
                    //* 0.5)
                    //).map(sqrt_norm)
-                + h).map(g);
+                + h).map(g);  //+ dep_l1->getLastMotorValues()
 
   y_buffer[t] = y;
   // Put new output vector in ring buffer y_buffer
@@ -596,6 +604,9 @@ void DEPDiamond::learnController(){
     h*=0;
 
   ///////////////// End of Controller Learning ////////
+
+  //cauculate the average of the controller matrix C for every leg 6*6 matrix to find correlation in C_avg;
+  C_avg = average_matrix(C,3);  //calculate the 3*3 average of this motor-sensor matrix.
 }
 
 void DEPDiamond::learnModel(double eps){

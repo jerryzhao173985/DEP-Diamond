@@ -2,7 +2,7 @@
 ## on revision 
 ## looking for best urate and synboost 
 
-for trial in {11..25}
+for trial in {1..25}
 do
   # number=$RANDOM
   echo TRIAL $trial/15

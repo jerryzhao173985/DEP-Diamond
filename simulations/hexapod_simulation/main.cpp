@@ -124,6 +124,8 @@ double initHeight=1.2;
 bool randomctrl=false;
 
 bool topview=false;
+bool with_12_delayed_sensors;
+
 
 int time_period;
 int layers;
@@ -240,6 +242,18 @@ public:
   int bin_x, bin_y, coverage, displacement;
   int cover[10][10];
   Pos position;
+
+  int collsion1_flag = 1;  //either 1 or 0 : default is on the floor, on the floor is 1, not on the floor is 0
+  int collsion2_flag = 1;  //either 1 or 0
+  int collsion3_flag = 1;  //either 1 or 0
+  int collsion4_flag = 1;  //either 1 or 0
+  int collsion5_flag = 1;  //either 1 or 0
+  int collsion6_flag = 1;  //either 1 or 0
+
+  double angle_xx;  //global/ [In simulation] params for(row, pitch, yaw)
+  double angle_yy;
+  double angle_zz;
+
 
   std::vector<int> period_of_coverage;
 
@@ -520,16 +534,21 @@ public:
       // on the top
       robot->place(osg::Matrix::rotate(-0.0*M_PI,0,1.0,0)*osg::Matrix::translate(0,0,initHeight+ 2*ii));
 
-      // add delayed sensors
-      std::list<SensorAttachment> sas = robot->getAttachedSensors();
-      int k=0;
-      for(auto& sa: sas){
-        if(k%2==0){
-          auto s = std::make_shared<DelaySensor>(sa.first,8);
-          robot->addSensor(s);
-          global.configs.push_back(s.get());
+
+
+      if(with_12_delayed_sensors){
+        // add delayed sensors
+        std::list<SensorAttachment> sas = robot->getAttachedSensors(); //18 basic sensor for now, same as action
+        int k=0;
+        for(auto& sa: sas){
+          if(k%2==0){
+            auto s = std::make_shared<DelaySensor>(sa.first,8);  //not delay tiebia(knee), only delay the leg. 12
+            robot->addSensor(s);
+            global.configs.push_back(s.get());
+          }
+          k++;
         }
-        k++;
+
       }
 
       // one can also attach additional sensors
@@ -817,7 +836,71 @@ public:
     int collision4 = dCollide (enviornment_ID, foot4_ID,N,&contact4[0].geom,sizeof(dContact));
     int collision5 = dCollide (enviornment_ID, foot5_ID,N,&contact5[0].geom,sizeof(dContact));
     int collision6 = dCollide (enviornment_ID, foot6_ID,N,&contact6[0].geom,sizeof(dContact));
-    std::cout<< "(" << collision1<<" , "<< collision2<<" , "<< collision3<<" , "<< collision4<<" , "<< collision5<<" , "<< collision6<<")" << std::endl;
+    // std::cout<< "(" << collision1<<" , "<< collision2<<" , "<< collision3<<" , "<< collision4<<" , "<< collision5<<" , "<< collision6<<")" << std::endl;
+    
+    // Visualization of which foot is touching the ground! (Visualize this on the upper leg joint)
+    if(collsion1_flag == 1 && collision1==0){
+      robot->getAllPrimitives()[1]->setColor(Color(1.,1.,1.,.99));   //(0,0,0) is black!!
+      collsion1_flag = 0;
+    }else if(collsion1_flag == 0 && collision1>0){
+      robot->getAllPrimitives()[1]->setColor(Color(0.,0.,0.,.99));
+      collsion1_flag = 1;
+    }
+    if(collsion2_flag == 1 && collision2==0){
+      robot->getAllPrimitives()[4]->setColor(Color(1.,1.,1.,.99));
+      collsion2_flag = 0;
+    }else if(collsion2_flag == 0 && collision2>0){
+      robot->getAllPrimitives()[4]->setColor(Color(0.,0.,0.,.99));
+      collsion2_flag = 1;
+    }
+    if(collsion3_flag == 1 && collision3==0){
+      robot->getAllPrimitives()[7]->setColor(Color(1.,1.,1.,.99));
+      collsion3_flag = 0;
+    }else if(collsion3_flag == 0 && collision3>0){
+      robot->getAllPrimitives()[7]->setColor(Color(0.,0.,0.,.99));
+      collsion3_flag = 1;
+    }
+    if(collsion4_flag == 1 && collision4==0){
+      robot->getAllPrimitives()[10]->setColor(Color(1.,1.,1.,.99));
+      collsion4_flag = 0;
+    }else if(collsion4_flag == 0 && collision4>0){
+      robot->getAllPrimitives()[10]->setColor(Color(0.,0.,0.,.99));
+      collsion4_flag = 1;
+    }
+    if(collsion5_flag == 1 && collision5==0){
+      robot->getAllPrimitives()[13]->setColor(Color(1.,1.,1.,.99));
+      collsion5_flag = 0;
+    }else if(collsion5_flag == 0 && collision5>0){
+      robot->getAllPrimitives()[13]->setColor(Color(0.,0.,0.,.99));
+      collsion5_flag = 1;
+    }
+    if(collsion6_flag == 1 && collision6==0){
+      robot->getAllPrimitives()[16]->setColor(Color(1.,1.,1.,.99));
+      collsion6_flag = 0;
+    }else if(collsion6_flag == 0 && collision6>0){
+      robot->getAllPrimitives()[16]->setColor(Color(0.,0.,0.,.99));
+      collsion6_flag = 1;
+    }
+    // if(collsion1_flag==0){if(collision1>0){collsion1_flag = 1;}
+    // }else{if(collision1==0){collsion1_flag = 0;}}
+    
+
+
+    FILE* collFile;
+    string collfileName = "collision.txt";
+    collFile = fopen(collfileName.c_str(), "a");
+    string collss;
+    collss = to_string(collision1) 
+        + "\t" + to_string(collision2)
+        + "\t" + to_string(collision3) 
+        + "\t" + to_string(collision4)
+        + "\t" + to_string(collision5)
+        + "\t" + to_string(collision6); 
+    fprintf(collFile, "%s\n", collss.c_str());
+    fclose(collFile);
+
+
+
 
     // LOG: Assertion `globalData.obstacles[0]->getMainPrimitive()!=NULL' failed.
     // std::cout <<  globalData.obstacles.size() <<std::endl;
@@ -832,8 +915,8 @@ public:
       Diamond* dia = dynamic_cast<Diamond*>(globalData.agents[0]->getController());
       dia->set_coverage(param_coverage);
     }
-    if(passing_coverage_to_internal_param)
-      setTitle("Coverage: " + to_string(coverage));
+    // if(passing_coverage_to_internal_param)
+    setTitle("Coverage: " + to_string(coverage));
 
 
     // print out the terrain coverage status every 5 minutes to show development of the controller:
@@ -871,6 +954,10 @@ public:
     double angle_x = atan2(pose3d.val(2,1),pose3d.val(2,2));
     double angle_y = atan2(-pose3d.val(2,0), sqrt(pose3d.val(2,1)*pose3d.val(2,1)+pose3d.val(2,2)*pose3d.val(2,2)));
     double angle_z = atan2(pose3d.val(1,0), pose3d.val(0,0));
+
+    angle_xx = angle_x;  //send these (yaw, pitcg, row) values to global params
+    angle_yy = angle_y;
+    angle_zz = angle_z;
 
 
     Pos po = robot->getMainPrimitive()->getPosition();
@@ -979,7 +1066,7 @@ public:
         setModel(global.agents[0]);
         break;
       
-      case 'p' :  // print out the model matrix (or the controller matrix) for every layer
+      case 'p' : { // print out the model matrix (or the controller matrix) for every layer
         Diamond* diamond = dynamic_cast<Diamond*>(global.agents[0]->getController());
         
         Matrix M1 = diamond->get_internal_layers()[0]->getM();
@@ -987,7 +1074,12 @@ public:
         
         std::cout << "M1: "<< std::endl << M1 << std::endl;
         std::cout << "M2: "<< std::endl << M1 << std::endl;
+        break; }  //the aim of the '{}' is to keep the local variables inside the case to be private!
+
+      case 'e' :  //print out Euler Angles
+        std::cout <<"( " << angle_xx <<" , "<< angle_yy << " , "<< angle_zz<<")" <<std::endl;
         break;
+      
       
       
       }
@@ -1110,6 +1202,10 @@ int main (int argc, char **argv)
   // }
   passing_coverage_to_internal_param = false;
   passing_coverage_to_internal_param = Simulation::contains(argv,argc,"-plot_coverage")    != 0;
+
+  with_12_delayed_sensors=false;
+  with_12_delayed_sensors = Simulation::contains(argv,argc,"-delayed_sensor")    != 0;
+
 
   terrain_coverage = false;
   terrain_coverage    = Simulation::contains(argv,argc,"-terrain_coverage")    != 0;

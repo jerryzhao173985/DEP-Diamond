@@ -63,6 +63,7 @@ void Diamond::init(int sensornumber, int motornumber, RandGen* randGen){
     //internal_layer.push_back(one_layer);
     addInspectableMatrix("M"+to_string(i+1), internal_layer[i]->getpM(), false, "inverse model matrix of layer"+to_string(i+1));
     addInspectableMatrix("C"+to_string(i+1), internal_layer[i]->getpC(), false, "controller matrix of layer "+to_string(i+1));
+    addInspectableMatrix("C_avg"+to_string(i+1), internal_layer[i]->getpC_avg(), false,  "Average C controller matrix for feet"+to_string(i+1));
     
     // addInspectableMatrix("L"+to_string(i+1), internal_layer[i]->getpL(), false, "Jacobian matrix of layer"+to_string(i+1));
     // addInspectableMatrix("EvRe"+to_string(i+1), internal_layer[i]->getpEvRe(), false, "Eigenvalue Real Part of layer"+to_string(i+1));

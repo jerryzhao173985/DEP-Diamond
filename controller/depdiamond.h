@@ -200,6 +200,9 @@ public:
   virtual matrix::Matrix* getpM(){  return &M;}
   virtual matrix::Matrix getC(){  return C; }
   virtual matrix::Matrix* getpC(){  return &C;}
+  virtual matrix::Matrix getC_avg(){  return C_avg; }
+  virtual matrix::Matrix* getpC_avg(){  return &C_avg;}
+
   virtual matrix::Matrix getEvRe(){  return eigenvaluesLRe; }
   virtual matrix::Matrix* getpEvRe(){  return &eigenvaluesLRe;}
   virtual matrix::Matrix getL(){  return L; }
@@ -269,6 +272,8 @@ protected:
   matrix::Matrix M; // Model Matrix
   matrix::Matrix C_update; // fast changing controller matrix (function of immediate history)
   matrix::Matrix C; // Acting Controller Matrix (normalized C_update)
+  matrix::Matrix C_avg;
+
   matrix::Matrix h; // Controller Bias
   matrix::Matrix b; // Model Bias
   matrix::Matrix L; // Jacobi Matrix
@@ -362,6 +367,42 @@ protected:
   static double limit_regular_one_over(double x){
     //min(max(x,-r),r)
     return min(max(1.0/(x+0.01), -5.0), 5.0);   //clip by 5
+  }
+
+  //calculate the 3*3 submatrix average for C (or do a convolution or max pooling?)
+  static matrix::Matrix average_matrix(matrix::Matrix CC ,int kk=3){
+    matrix::Matrix CC_avg;
+    int NN = CC.getM();
+    int nn = NN/kk;
+    int MM = CC.getN();
+    int mm = MM/kk;
+    CC_avg.set(nn, mm);
+    double sum=0.0;
+    double num_avg = 0.0;
+    int count=0;
+
+    for(int n=0; n<nn; n++){
+      for(int m=0; m<mm; m++){
+        sum = 0.0;
+        count = 0;
+        for(int i=0; i<NN; i++){
+          for(int j=0; j<MM; j++){
+            
+            if(i>=n*kk && i<(n+1)*kk && j>=m*kk && j<(m+1)*kk){
+              sum += CC.val(i, j);
+              count += 1;
+            }
+    
+          }
+        }
+        // std::cout <<"count: "<< count<< " ,with sum: "<< sum <<std::endl;
+        // num_avg = sum/ (double) count;
+        CC_avg.val(n,m) = sum;  //num_avg;
+
+      }
+    }
+
+    return CC_avg;
   }
 
 
