@@ -230,7 +230,13 @@ main.o: ../../utils/mapgen/ppm.h ../../utils/mapgen/PerlinNoise.h
 main.o: /usr/include/gsl/gsl_histogram.h terrainground.h
 main.o: /usr/local/include/ode_robots/heightfieldprimitive.h
 main.o: /usr/local/include/ode_robots/osgheightfield.h
-main.o: /usr/local/include/ode_robots/abstractobstacle.h
+main.o: /usr/local/include/ode_robots/abstractobstacle.h ../../utils/CImg.h
+main.o: /usr/include/unistd.h /usr/include/getopt.h /usr/include/dirent.h
+main.o: /usr/include/fnmatch.h /usr/include/X11/Xlib.h /usr/include/X11/X.h
+main.o: /usr/include/X11/Xfuncproto.h /usr/include/X11/Xosdefs.h
+main.o: /usr/include/X11/Xutil.h /usr/include/X11/keysym.h
+main.o: /usr/include/X11/keysymdef.h /usr/include/pthread.h
+main.o: /usr/include/endian.h /usr/include/sched.h
 ../../controller/depdiamond.o: ../../controller/depdiamond.h
 ../../controller/depdiamond.o: /usr/local/include/selforg/matrixutils.h
 ../../controller/depdiamond.o: /usr/local/include/selforg/matrix.h

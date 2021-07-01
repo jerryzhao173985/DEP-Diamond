@@ -96,6 +96,10 @@
 
 #include <vector>
 
+//image processing library for screenshot images Cimg Library.
+#include "../../utils/CImg.h"
+using namespace cimg_library;
+
 
 // fetch all the stuff of lpzrobots into scope
 using namespace lpzrobots;
@@ -1080,6 +1084,64 @@ public:
         std::cout <<"( " << angle_xx <<" , "<< angle_yy << " , "<< angle_zz<<")" <<std::endl;
         break;
       
+      case 'i':{
+
+        Diamond* diamond = dynamic_cast<Diamond*>(global.agents[0]->getController());
+        Matrix M1 = diamond->get_internal_layers()[0]->getM();
+        int all_items = (M1.getM()) * (M1.getN());
+
+        CImg<double> values1(1, all_items, 1, 1, 0);
+
+        for (int i1 = 0; i1 < all_items; ++i1)
+        {
+          int j = i1%(M1.getM());  
+          values1(0, i1) = M1.val((i1-j)/M1.getM() ,j);
+        }
+
+        const char *const formula = "M1 matrix all items";
+        const float x0 = (double) 1. ;
+        const float x1 = (double) all_items;
+        const int resolution = all_items;
+        const unsigned int nresolution = resolution>1 ? resolution : 5000;
+        const unsigned int plot_type = 1;
+        const unsigned int vertex_type = 1;
+
+        CImgDisplay disp1;
+        CImg<double> values2;
+        values1.display_graph(disp1, plot_type, vertex_type, "X Axis", x0, x1, "Y Axis");
+        disp1.snapshot(values2);
+        values2.save_bmp("Matrix_M.bmp");
+
+        break;}
+
+
+        case 'I':{
+        Diamond* diamond = dynamic_cast<Diamond*>(global.agents[0]->getController());
+        Matrix M1 = diamond->get_internal_layers()[0]->getC();
+        int all_items = (M1.getM()) * (M1.getN());
+        CImg<double> values1(1, all_items, 1, 1, 0);
+
+        for (int i1 = 0; i1 < all_items; ++i1)
+        {
+          int j = i1%(M1.getM());  
+          values1(0, i1) = M1.val((i1-j)/M1.getM() ,j);
+        }
+
+        const char *const formula = "C1 matrix all items";
+        const float x0 = (double) 1. ;
+        const float x1 = (double) all_items;
+        const int resolution = all_items;
+        const unsigned int nresolution = resolution>1 ? resolution : 5000;
+        const unsigned int plot_type = 1;
+        const unsigned int vertex_type = 1;
+
+        CImgDisplay disp1;
+        CImg<double> values2;
+        values1.display_graph(disp1, plot_type, vertex_type, "X Axis", x0, x1, "Y Axis");
+        disp1.snapshot(values2);
+        values2.save_bmp("matrix_C.bmp");
+        break;}
+
       
       
       }
@@ -1125,6 +1187,7 @@ public:
 
 int main (int argc, char **argv)
 {
+  
   int index = Simulation::contains(argv,argc,"-numwalls");
   if(index >0 && argc>index){
     numwalls=atoi(argv[index]);
