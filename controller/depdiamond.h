@@ -213,10 +213,33 @@ public:
     M=_M;
   }
   // accessors to matrices
-  //virtual matrix::Matrix getC(){  return C_update; }
+  // virtual matrix::Matrix getC(){  return C_update; }
+  
+  virtual matrix::Matrix getC_update(){  return C_update; }
+
+  virtual void setC_update(const matrix::Matrix& _C_update){
+    assert(C_update.getM() == _C_update.getM() && C_update.getN() == _C_update.getN());
+    C_update=_C_update;
+  }
+
+
   virtual void setC(const matrix::Matrix& _C){
-    assert(C_update.getM() == _C.getM() && C_update.getN() == _C.getN());
-    C_update=_C;
+    assert(C.getM() == _C.getM() && C.getN() == _C.getN());
+    C=_C;
+  }
+
+
+  virtual double get_synboost(){  return synboost;  }
+  virtual void set_synboost(double _synboost){
+    synboost = _synboost;
+  }
+
+  virtual void printConf(){
+    std::cout<< "The synboost is: "<< synboost <<std::endl;
+    std::cout<< "The learning rate is: "<< urate <<std::endl;
+    std::cout<< "The epsM is: "<< epsM <<std::endl;
+    std::cout<< "The epsh is: "<< epsh <<std::endl;
+    
   }
 
 

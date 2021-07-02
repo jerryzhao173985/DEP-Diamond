@@ -156,6 +156,24 @@ bool playground; // use "playgournd" and terrain map with coonfig option "-zsize
 string map_name = "map.ppm";
 unsigned int seed = 237;
 
+
+//buffer for plot
+CImg<double> colli1(1, 1000, 1, 1, 0);
+CImg<double> colli2(1, 1000, 1, 1, 0);
+CImg<double> colli3(1, 1000, 1, 1, 0);
+CImg<double> colli4(1, 1000, 1, 1, 0);
+CImg<double> colli5(1, 1000, 1, 1, 0);
+CImg<double> colli6(1, 1000, 1, 1, 0);
+CImg<double> invcolli1(1, 1000, 1, 1, 0);
+CImg<double> invcolli2(1, 1000, 1, 1, 0);
+CImg<double> invcolli3(1, 1000, 1, 1, 0);
+CImg<double> invcolli4(1, 1000, 1, 1, 0);
+CImg<double> invcolli5(1, 1000, 1, 1, 0);
+CImg<double> invcolli6(1, 1000, 1, 1, 0);
+// colli(0, 0) = 0.0;
+bool plot_collision = true;
+
+
 void map_gen(int seed) {
 	// Define the size of the image
 	unsigned int width = 256, height = 256;
@@ -260,6 +278,7 @@ public:
 
 
   std::vector<int> period_of_coverage;
+
 
   ThisSim(){
     addPaletteFile("colors/UrbanExtraColors.gpl");
@@ -824,6 +843,14 @@ public:
     dGeomID foot4_ID = robot->getAllPrimitives()[12]->getGeom();
     dGeomID foot5_ID = robot->getAllPrimitives()[15]->getGeom();
     dGeomID foot6_ID = robot->getAllPrimitives()[18]->getGeom();
+    //MARK: if the foot is stuck all in the ground, then the flag will be 0 because it is the collision with the lower leg not the foot any more!
+    dGeomID lowerleg1_ID = robot->getAllPrimitives()[2]->getGeom();
+    dGeomID lowerleg2_ID = robot->getAllPrimitives()[5]->getGeom();
+    dGeomID lowerleg3_ID = robot->getAllPrimitives()[8]->getGeom();
+    dGeomID lowerleg4_ID = robot->getAllPrimitives()[11]->getGeom();
+    dGeomID lowerleg5_ID = robot->getAllPrimitives()[14]->getGeom();
+    dGeomID lowerleg6_ID = robot->getAllPrimitives()[17]->getGeom();
+
     // //std::cout << BOLDBLUE << enviornment_ID << RESET <<std::endl;
     // int collision;
     const int N = 10;
@@ -840,53 +867,80 @@ public:
     int collision4 = dCollide (enviornment_ID, foot4_ID,N,&contact4[0].geom,sizeof(dContact));
     int collision5 = dCollide (enviornment_ID, foot5_ID,N,&contact5[0].geom,sizeof(dContact));
     int collision6 = dCollide (enviornment_ID, foot6_ID,N,&contact6[0].geom,sizeof(dContact));
+    
+    dContact lowerlegcontact1[N];
+    dContact lowerlegcontact2[N];
+    dContact lowerlegcontact3[N];
+    dContact lowerlegcontact4[N];
+    dContact lowerlegcontact5[N];
+    dContact lowerlegcontact6[N];
+    int lowerlegcollision1 = dCollide (enviornment_ID, lowerleg1_ID,N,&lowerlegcontact1[0].geom,sizeof(dContact));
+    int lowerlegcollision2 = dCollide (enviornment_ID, lowerleg2_ID,N,&lowerlegcontact2[0].geom,sizeof(dContact));
+    int lowerlegcollision3 = dCollide (enviornment_ID, lowerleg3_ID,N,&lowerlegcontact3[0].geom,sizeof(dContact));
+    int lowerlegcollision4 = dCollide (enviornment_ID, lowerleg4_ID,N,&lowerlegcontact4[0].geom,sizeof(dContact));
+    int lowerlegcollision5 = dCollide (enviornment_ID, lowerleg5_ID,N,&lowerlegcontact5[0].geom,sizeof(dContact));
+    int lowerlegcollision6 = dCollide (enviornment_ID, lowerleg6_ID,N,&lowerlegcontact6[0].geom,sizeof(dContact));
     // std::cout<< "(" << collision1<<" , "<< collision2<<" , "<< collision3<<" , "<< collision4<<" , "<< collision5<<" , "<< collision6<<")" << std::endl;
     
     // Visualization of which foot is touching the ground! (Visualize this on the upper leg joint)
-    if(collsion1_flag == 1 && collision1==0){
-      robot->getAllPrimitives()[1]->setColor(Color(1.,1.,1.,.99));   //(0,0,0) is black!!
+    if(collsion1_flag == 1 && collision1==0 && lowerlegcollision1==0){
+      robot->getAllPrimitives()[1]->setColor(Color(1.,1.,1.,.99));    //(1,1,1) is white!!
       collsion1_flag = 0;
-    }else if(collsion1_flag == 0 && collision1>0){
-      robot->getAllPrimitives()[1]->setColor(Color(0.,0.,0.,.99));
+    }else if(collsion1_flag == 0 && (collision1>0 || lowerlegcollision1>0)){
+      robot->getAllPrimitives()[1]->setColor(Color(0.,0.,0.,.99));    //(0,0,0) is black!!
       collsion1_flag = 1;
     }
-    if(collsion2_flag == 1 && collision2==0){
+    if(collsion2_flag == 1 && collision2==0 && lowerlegcollision2==0){
       robot->getAllPrimitives()[4]->setColor(Color(1.,1.,1.,.99));
       collsion2_flag = 0;
-    }else if(collsion2_flag == 0 && collision2>0){
+    }else if(collsion2_flag == 0 && (collision2>0 || lowerlegcollision2>0)){
       robot->getAllPrimitives()[4]->setColor(Color(0.,0.,0.,.99));
       collsion2_flag = 1;
     }
-    if(collsion3_flag == 1 && collision3==0){
+    if(collsion3_flag == 1 && collision3==0 && lowerlegcollision3==0){
       robot->getAllPrimitives()[7]->setColor(Color(1.,1.,1.,.99));
       collsion3_flag = 0;
-    }else if(collsion3_flag == 0 && collision3>0){
+    }else if(collsion3_flag == 0 && (collision3>0 || lowerlegcollision3>0)){
       robot->getAllPrimitives()[7]->setColor(Color(0.,0.,0.,.99));
       collsion3_flag = 1;
     }
-    if(collsion4_flag == 1 && collision4==0){
+    if(collsion4_flag == 1 && collision4==0 && lowerlegcollision4==0){
       robot->getAllPrimitives()[10]->setColor(Color(1.,1.,1.,.99));
       collsion4_flag = 0;
-    }else if(collsion4_flag == 0 && collision4>0){
+    }else if(collsion4_flag == 0 && (collision4>0 || lowerlegcollision4>0)){
       robot->getAllPrimitives()[10]->setColor(Color(0.,0.,0.,.99));
       collsion4_flag = 1;
     }
-    if(collsion5_flag == 1 && collision5==0){
+    if(collsion5_flag == 1 && collision5==0 && lowerlegcollision5==0){
       robot->getAllPrimitives()[13]->setColor(Color(1.,1.,1.,.99));
       collsion5_flag = 0;
-    }else if(collsion5_flag == 0 && collision5>0){
+    }else if(collsion5_flag == 0 && (collision5>0 || lowerlegcollision5>0)){
       robot->getAllPrimitives()[13]->setColor(Color(0.,0.,0.,.99));
       collsion5_flag = 1;
     }
-    if(collsion6_flag == 1 && collision6==0){
+    if(collsion6_flag == 1 && collision6==0 && lowerlegcollision6==0){
       robot->getAllPrimitives()[16]->setColor(Color(1.,1.,1.,.99));
       collsion6_flag = 0;
-    }else if(collsion6_flag == 0 && collision6>0){
+    }else if(collsion6_flag == 0 && (collision6>0 || lowerlegcollision6>0)){
       robot->getAllPrimitives()[16]->setColor(Color(0.,0.,0.,.99));
       collsion6_flag = 1;
     }
     // if(collsion1_flag==0){if(collision1>0){collsion1_flag = 1;}
     // }else{if(collision1==0){collsion1_flag = 0;}}
+
+    // if(collsion1_flag==0){
+    //   if(collision1>0 || lowerlegcollision1>0){
+    //     collsion1_flag = 1;
+    //   }
+    // }else{
+    //   if(collision1==0){
+    //     if(lowerlegcollision1==0){
+    //       collsion1_flag = 0;
+    //     }
+    //   }
+    // }
+
+    // std::cout<<  collsion1_flag <<" ,"<<collsion2_flag<<" ," << collsion3_flag<<" ,"<< collsion4_flag<<" ,"<< collsion5_flag<<" ,"<< collsion6_flag  <<std::endl;
     
 
 
@@ -1055,7 +1109,70 @@ public:
     // }
     // position = po;
 
+
+    //adding the steps collision information to the buffer
+    if(globalData.sim_step%10==0){
+      colli1(0, (globalData.sim_step/10)%1000) = (double) collsion1_flag+8.;
+      colli2(0, (globalData.sim_step/10)%1000) = (double) collsion2_flag+6.5;
+      colli3(0, (globalData.sim_step/10)%1000) = (double) collsion3_flag+5.;     //*3.5;
+      colli4(0, (globalData.sim_step/10)%1000) = (double) collsion4_flag+3.5;
+      colli5(0, (globalData.sim_step/10)%1000) = (double) collsion5_flag+2.;
+      colli6(0, (globalData.sim_step/10)%1000) = (double) collsion6_flag+0.5;
+      //inverse of the signal, see spike (when the feet leaves terrain more clearly!)
+      invcolli1(0, (globalData.sim_step/10)%1000) = ((double) (1-collsion1_flag))+8.;
+      invcolli2(0, (globalData.sim_step/10)%1000) = ((double) (1-collsion2_flag))+6.5;
+      invcolli3(0, (globalData.sim_step/10)%1000) = ((double) (1-collsion3_flag))+5.;     //*3.5;
+      invcolli4(0, (globalData.sim_step/10)%1000) = ((double) (1-collsion4_flag))+3.5;
+      invcolli5(0, (globalData.sim_step/10)%1000) = ((double) (1-collsion5_flag))+2.;
+      invcolli6(0, (globalData.sim_step/10)%1000) = ((double) (1-collsion6_flag))+0.5;
+    }
+    if(plot_collision){
+      if(globalData.sim_step%10000==0){  //after 100 seconds
+        std::cout << BOLDBLACK<< "------Plot collision------" <<RESET<< std::endl;
+        // CImgDisplay dispcoll1, dispcoll2;   // This is for simple vector plot display!
+        // colli1.display_graph(dispcoll1, 1, 1, "X Axis", 1., 1000., "Y Axis");
+        // colli2.display_graph(dispcoll2, 1, 1, "X Axis", 1., 1000., "Y Axis");
+
+        
+        CImg<unsigned char> visu(3000,1500,1,3,0), inv_visu(3000,1500,1,3,0);
+        const unsigned char red[] = { 255,0,0 }, green[] = { 0,255,0 }, blue[] = { 0,0,255 }, yellow[] = {250,241,107}, purple[] = {221, 139, 222}, white[] = {255,255,255} ;
+        CImgDisplay draw_disp(visu,"feet gait visualization"), inv_draw_disp(inv_visu,"gait visualization");
+        
+        while (!draw_disp.is_closed() && !inv_draw_disp.is_closed()) {
+          visu.fill(0).draw_graph(colli1, white, 1 ,1 ,0., 9.5, 0);
+          visu.draw_graph(colli2, purple, 1 ,1 ,0., 9.5, 0);
+          visu.draw_graph(colli3, yellow, 1 ,1 ,0., 9.5, 0);
+          visu.draw_graph(colli4, blue, 1 ,1 ,0., 9.5, 0);
+          visu.draw_graph(colli5, green, 1 ,1 ,0., 9.5, 0);
+          visu.draw_graph(colli6, red, 1 ,1 ,0., 9.5, 0).display(draw_disp); //,false,0,true);
+
+          inv_visu.fill(0).draw_graph(invcolli1, white, 1 ,1 ,0., 9.5, 0);
+          inv_visu.draw_graph(invcolli2, purple, 1 ,1 ,0., 9.5, 0);
+          inv_visu.draw_graph(invcolli3, yellow, 1 ,1 ,0., 9.5, 0);
+          inv_visu.draw_graph(invcolli4, blue, 1 ,1 ,0., 9.5, 0);
+          inv_visu.draw_graph(invcolli5, green, 1 ,1 ,0., 9.5, 0);
+          inv_visu.draw_graph(invcolli6, red, 1 ,1 ,0., 9.5, 0).display(inv_draw_disp); //,false,0,true);
+        }
+
+        CImg<double> snap, inv_snap;
+        draw_disp.snapshot(snap);
+
+        char szFileName[50] = {0};
+        sprintf(szFileName, "visu/collision_flag_visualization_%d.bmp", globalData.sim_step/10000);
+        // char* ss_name = "collision_flag_visualization_"+to_string(globalData.sim_step/10000)+".bmp";
+        // const char* filename_visu = "collision_flag_visualization_"+to_string(globalData.sim_step/10000)+".bmp";
+        snap.save_bmp(szFileName);
+
+
+        inv_draw_disp.snapshot(inv_snap);
+        char inv_szFileName[50] = {0};
+        sprintf(inv_szFileName, "visu/inv_collision_flag_visualization_%d.bmp", globalData.sim_step/10000);
+        inv_snap.save_bmp(inv_szFileName);
+      }
+    }
     
+
+
   }
 
   virtual void bindingDescription(osg::ApplicationUsage & au) const {
@@ -1085,7 +1202,7 @@ public:
         break;
       
       case 'i':{
-
+        std::cout << BOLDBLACK<< "------Plot M1------" <<RESET<< std::endl;
         Diamond* diamond = dynamic_cast<Diamond*>(global.agents[0]->getController());
         Matrix M1 = diamond->get_internal_layers()[0]->getM();
         int all_items = (M1.getM()) * (M1.getN());
@@ -1111,11 +1228,12 @@ public:
         values1.display_graph(disp1, plot_type, vertex_type, "X Axis", x0, x1, "Y Axis");
         disp1.snapshot(values2);
         values2.save_bmp("Matrix_M.bmp");
-
+        
         break;}
 
 
         case 'I':{
+        std::cout << BOLDBLACK<< "------Plot C1------" <<RESET<< std::endl;
         Diamond* diamond = dynamic_cast<Diamond*>(global.agents[0]->getController());
         Matrix M1 = diamond->get_internal_layers()[0]->getC();
         int all_items = (M1.getM()) * (M1.getN());
@@ -1140,7 +1258,218 @@ public:
         values1.display_graph(disp1, plot_type, vertex_type, "X Axis", x0, x1, "Y Axis");
         disp1.snapshot(values2);
         values2.save_bmp("matrix_C.bmp");
+        
         break;}
+
+
+        case 'l':{
+        Diamond* diamond = dynamic_cast<Diamond*>(global.agents[0]->getController());
+        Matrix C1 = diamond->get_internal_layers()[0]->getC_update();
+        
+        Matrix LC(C1.getM(), C1.getN());
+        for(int i=0; i<C1.getM(); i++){
+          for(int j=0; j<C1.getN(); j++){
+            LC.val(i,j) = 1.0; //C1.val(i,j) * 2.0;
+            //MARK: Here cannot set *2 times, because after normalize it is still the same 
+          }
+        }
+        diamond->get_internal_layers()[0]->setC_update(LC);
+        std::cout << BOLDMAGENTA<< "C1(update) enlarged by 2.0" <<RESET<< std::endl;
+        break;}
+
+        case 'L':{
+        Diamond* diamond = dynamic_cast<Diamond*>(global.agents[0]->getController());
+        Matrix C1 = diamond->get_internal_layers()[0]->getM();
+        
+        Matrix LC(C1.getM(), C1.getN());
+        for(int i=0; i<C1.getM(); i++){
+          for(int j=0; j<C1.getN(); j++){
+            LC.val(i,j) = C1.val(i,j) * 2.0;
+          }
+        }
+        diamond->get_internal_layers()[0]->setM(LC);
+        std::cout << BOLDMAGENTA<< "M1 enlarged by 2.0" << RESET << std::endl;
+        break;}
+
+
+        /* Hexapod leg number
+            \  /
+              ||
+        4--|~~~~|--5
+            |    |
+        2--|    |--3
+            |    |
+        0--|____|--1
+        Each leg has up/down, front/back and tebia (knee)*/  
+        // set connections into model      
+        case 't':{
+        Diamond* diamond = dynamic_cast<Diamond*>(global.agents[0]->getController());
+        Matrix M = diamond->get_internal_layers()[0]->getM();
+        // LC is transposed for historical reasons
+        Matrix LC(M.getN(), M.getM());
+        /// TRIPOD
+        for(int k=0; k<2; k++){    //   k=0  ,   k=1
+          // leg 0: 3,4
+          LC.val(3*3+k,0*3+k)=.5;   // (9, 0) , (10, 1)
+          LC.val(4*3+k,0*3+k)=.5;   // (12, 0), (13, 1)
+          // leg 1: 2,5
+          LC.val(2*3+k,1*3+k)=.5;   // (6 ,3) , (7, 4)
+          LC.val(5*3+k,1*3+k)=.5;   // (15,3) , (16,4)
+          // leg 2: 1,5
+          LC.val(1*3+k,2*3+k)=.5;   // (3, 6) , (4, 7)
+          LC.val(5*3+k,2*3+k)=.5;   // (15,6) , (16,7)
+          // leg 3: 0,4
+          LC.val(0*3+k,3*3+k)=.5;   // (0, 9) , (1, 10)
+          LC.val(4*3+k,3*3+k)=.5;   // (12,9) , (13,10)
+          // leg 4: 0,3
+          LC.val(0*3+k,4*3+k)=.5;   // (0,12) , (1, 13)
+          LC.val(3*3+k,4*3+k)=.5;   // (9,12) , (10,13)
+          // leg 5: 1,2
+          LC.val(1*3+k,5*3+k)=.5;   // (3,15) , (4, 16)
+          LC.val(2*3+k,5*3+k)=.5;   // (6,15) , (7, 16)
+        }
+      
+        diamond->get_internal_layers()[0]->setM((LC^T));  //setM(M+(LC^T));
+        break;}
+
+        case 'T':{   //second layer
+        Diamond* diamond = dynamic_cast<Diamond*>(global.agents[0]->getController());
+        Matrix M = diamond->get_internal_layers()[1]->getM();
+        Matrix LC(M.getN(), M.getM());
+        for(int k=0; k<2; k++){    //   k=0  ,   k=1
+          LC.val(3*3+k,0*3+k)=.5;   // (9, 0) , (10, 1)
+          LC.val(4*3+k,0*3+k)=.5;   // (12, 0), (13, 1)
+          LC.val(2*3+k,1*3+k)=.5;   // (6 ,3) , (7, 4)
+          LC.val(5*3+k,1*3+k)=.5;   // (15,3) , (16,4)
+          LC.val(1*3+k,2*3+k)=.5;   // (3, 6) , (4, 7)
+          LC.val(5*3+k,2*3+k)=.5;   // (15,6) , (16,7)
+          LC.val(0*3+k,3*3+k)=.5;   // (0, 9) , (1, 10)
+          LC.val(4*3+k,3*3+k)=.5;   // (12,9) , (13,10)
+          LC.val(0*3+k,4*3+k)=.5;   // (0,12) , (1, 13)
+          LC.val(3*3+k,4*3+k)=.5;   // (9,12) , (10,13)
+          LC.val(1*3+k,5*3+k)=.5;   // (3,15) , (4, 16)
+          LC.val(2*3+k,5*3+k)=.5;   // (6,15) , (7, 16)
+        }
+        diamond->get_internal_layers()[1]->setM((LC^T));  //setM(M+(LC^T));
+        break;}
+
+        case 'b':{  //increase the synboost
+        Diamond* diamond = dynamic_cast<Diamond*>(global.agents[0]->getController());
+        double boost = diamond->get_internal_layers()[0]->get_synboost();
+        diamond->get_internal_layers()[0]->set_synboost(boost+0.05);
+        std::cout<< BLUE << "Now the synboost for "<<RED<<"layer 1" << BLUE<<" is: " << boost+0.05 << RESET<< std::endl;
+        break;}
+
+        case 'B':{
+        Diamond* diamond = dynamic_cast<Diamond*>(global.agents[0]->getController());
+        double boost = diamond->get_internal_layers()[1]->get_synboost();
+        diamond->get_internal_layers()[1]->set_synboost(boost+0.05);
+        std::cout<< BLUE << "Now the synboost for "<<RED<< "layer 2" << BLUE<<" is: " << boost+0.05 << RESET<< std::endl;
+        break;}
+
+        case 'c':{  //Lower case for layer 1: print out the config
+        std::cout << BOLDCYAN << "This is the config for "<<RED<< "Layer 1: " <<RESET << std::endl;
+        Diamond* diamond = dynamic_cast<Diamond*>(global.agents[0]->getController());
+        diamond->get_internal_layers()[0]->printConf();
+        break;}
+        case 'C':{  //Capital case for layer 2: print out the config
+        std::cout << BOLDCYAN << "This is the config for "<<RED<< "Layer 2: " <<RESET << std::endl;
+        Diamond* diamond = dynamic_cast<Diamond*>(global.agents[0]->getController());
+        diamond->get_internal_layers()[1]->printConf();
+        break;}
+
+        // case 'T':{
+        // Diamond* diamond = dynamic_cast<Diamond*>(global.agents[0]->getController());
+        // Matrix M = diamond->get_internal_layers()[0]->getM();
+        
+        // diamond->get_internal_layers()[0]->setM(LC);
+        // break;}
+
+
+        // case 'l':{
+        // Diamond* diamond = dynamic_cast<Diamond*>(global.agents[0]->getController());
+        // Matrix M = diamond->get_internal_layers()[0]->getM();
+        
+        // diamond->get_internal_layers()[0]->setM(LC);
+        // break;}
+
+
+        // case 'L':{
+        // Diamond* diamond = dynamic_cast<Diamond*>(global.agents[0]->getController());
+        // Matrix M = diamond->get_internal_layers()[0]->getM();
+        
+        // diamond->get_internal_layers()[0]->setM(LC);
+        // break;}
+
+
+
+
+      //   if(walkmodel && dep){
+      //   Matrix M = dep->getM();
+      //   // LC is transposed for historical reasons
+      //   Matrix LC(M.getN(), M.getM());
+      //   /// TRIPOD
+      //   if(tripod){
+          
+      //   }
+      //   // subsequent legs on one side are negatively coupled (antiphasic)
+      //   if(tripod_neg){
+      //     for(int k=1; k<2; k++){ // front/back only
+      //       // leg 0: - 2
+      //       LC.val(2*3+k,0*3+k)=-1;
+      //       // leg 1: - 3
+      //       LC.val(3*3+k,1*3+k)=-1;
+      //       // leg 2:  -4
+      //       LC.val(4*3+k,2*3+k)=-1;
+      //       // leg 3:  -5
+      //       LC.val(5*3+k,3*3+k)=-1;
+      //       // leg 4:  -5
+      //       //LC.val(5*3+k,4*3+k)=-1;
+      //       // leg 5:  -4
+      //       //LC.val(4*3+k,5*3+k)=-1;
+      //     }
+      //   }
+      //   // left and right leg pairs are negatively coupled (antiphasic)
+      //   if(lateral_neg){
+      //     for(int k=1; k<2; k++){// only front/back
+      //       // leg 0: 1
+      //       LC.val(1*3+k,0*3+k)=-1;
+      //       // leg 1: 0
+      //       LC.val(0*3+k,1*3+k)=-1;
+      //       // leg 2: 3
+      //       LC.val(3*3+k,2*3+k)=-1;
+      //       // leg 3: 2
+      //       LC.val(2*3+k,3*3+k)=-1;
+      //       // leg 4: 5
+      //       LC.val(5*3+k,4*3+k)=-1;
+      //       // leg 5: 4
+      //       LC.val(4*3+k,5*3+k)=-1;
+      //     }
+      //   }
+
+      //   // delays (the delay sensors start with index 18 and for each leg we have 2,
+      //   //  but we use only one for the connection
+      //   if(walkdelay){
+      //     for(int k=0; k<6; k++){
+      //       LC.val(18+k*2+1,k*3)=1;
+      //     }
+      //   }
+
+      //   if(legdelay){
+      //     int k = 1;
+      //     // leg 0: - 2
+      //     LC.val(18+2*2+k,0*3+k)=1;
+      //     // leg 1: - 3
+      //     LC.val(18+3*2+k,1*3+k)=1;
+      //     // leg 2:  -4
+      //     LC.val(18+4*2+k,2*3+k)=1;
+      //     // leg 3:  -5
+      //     LC.val(18+5*2+k,3*3+k)=1;
+      //   }
+
+      //   std::cout << "apply Leg coupling" << std::endl;
+      //   dep->setM(M+(LC^T));
+      // }
 
       
       
@@ -1187,7 +1516,7 @@ public:
 
 int main (int argc, char **argv)
 {
-  
+
   int index = Simulation::contains(argv,argc,"-numwalls");
   if(index >0 && argc>index){
     numwalls=atoi(argv[index]);
