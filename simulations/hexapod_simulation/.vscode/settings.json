@@ -53,6 +53,10 @@
         "cinttypes": "cpp",
         "utility": "cpp",
         "typeindex": "cpp",
-        "typeinfo": "cpp"
+        "typeinfo": "cpp",
+        "string": "cpp",
+        "mixinvector": "cpp",
+        "buffered_value": "cpp",
+        "random": "cpp"
     }
 }

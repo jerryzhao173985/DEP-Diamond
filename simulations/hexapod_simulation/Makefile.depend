@@ -236,7 +236,40 @@ main.o: /usr/include/fnmatch.h /usr/include/X11/Xlib.h /usr/include/X11/X.h
 main.o: /usr/include/X11/Xfuncproto.h /usr/include/X11/Xosdefs.h
 main.o: /usr/include/X11/Xutil.h /usr/include/X11/keysym.h
 main.o: /usr/include/X11/keysymdef.h /usr/include/pthread.h
-main.o: /usr/include/endian.h /usr/include/sched.h
+main.o: /usr/include/endian.h /usr/include/sched.h ../../utils/fft/FFT.h
+main.o: /usr/local/include/libff/common/double.hpp
+main.o: /usr/local/include/libff/algebra/fields/bigint.hpp
+main.o: /usr/local/include/libff/common/serialization.hpp
+main.o: /usr/local/include/libff/common/serialization.tcc
+main.o: /usr/local/include/libff/common/utils.hpp
+main.o: /usr/local/include/libff/common/utils.tcc
+main.o: /usr/local/include/libff/algebra/fields/bigint.tcc
+main.o: /usr/local/include/libfqfft/evaluation_domain/get_evaluation_domain.hpp
+main.o: /usr/local/include/libfqfft/evaluation_domain/evaluation_domain.hpp
+main.o: /usr/local/include/libfqfft/evaluation_domain/get_evaluation_domain.tcc
+main.o: /usr/local/include/libfqfft/evaluation_domain/domains/arithmetic_sequence_domain.hpp
+main.o: /usr/local/include/libfqfft/evaluation_domain/domains/arithmetic_sequence_domain.tcc
+main.o: /usr/local/include/libfqfft/evaluation_domain/domains/basic_radix2_domain_aux.hpp
+main.o: /usr/local/include/libfqfft/evaluation_domain/domains/basic_radix2_domain_aux.tcc
+main.o: /usr/local/include/libff/algebra/fields/field_utils.hpp
+main.o: /usr/local/include/libff/algebra/fields/field_utils.tcc
+main.o: /usr/local/include/libfqfft/tools/exceptions.hpp
+main.o: /usr/local/include/libfqfft/polynomial_arithmetic/basis_change.hpp
+main.o: /usr/local/include/libfqfft/polynomial_arithmetic/basis_change.tcc
+main.o: /usr/local/include/libfqfft/polynomial_arithmetic/basic_operations.hpp
+main.o: /usr/local/include/libfqfft/polynomial_arithmetic/basic_operations.tcc
+main.o: /usr/local/include/libfqfft/kronecker_substitution/kronecker_substitution.hpp
+main.o: /usr/local/include/libfqfft/kronecker_substitution/kronecker_substitution.tcc
+main.o: /usr/local/include/libfqfft/polynomial_arithmetic/xgcd.hpp
+main.o: /usr/local/include/libfqfft/polynomial_arithmetic/xgcd.tcc
+main.o: /usr/local/include/libfqfft/evaluation_domain/domains/basic_radix2_domain.hpp
+main.o: /usr/local/include/libfqfft/evaluation_domain/domains/basic_radix2_domain.tcc
+main.o: /usr/local/include/libfqfft/evaluation_domain/domains/extended_radix2_domain.hpp
+main.o: /usr/local/include/libfqfft/evaluation_domain/domains/extended_radix2_domain.tcc
+main.o: /usr/local/include/libfqfft/evaluation_domain/domains/geometric_sequence_domain.hpp
+main.o: /usr/local/include/libfqfft/evaluation_domain/domains/geometric_sequence_domain.tcc
+main.o: /usr/local/include/libfqfft/evaluation_domain/domains/step_radix2_domain.hpp
+main.o: /usr/local/include/libfqfft/evaluation_domain/domains/step_radix2_domain.tcc
 ../../controller/depdiamond.o: ../../controller/depdiamond.h
 ../../controller/depdiamond.o: /usr/local/include/selforg/matrixutils.h
 ../../controller/depdiamond.o: /usr/local/include/selforg/matrix.h
@@ -414,3 +447,4 @@ terrainground.o: /usr/local/include/ode_robots/osgprimitive.h
 terrainground.o: /usr/local/include/ode_robots/abstractobstacle.h
 ../../utils/mapgen/PerlinNoise.o: ../../utils/mapgen/PerlinNoise.h
 ../../utils/mapgen/ppm.o: ../../utils/mapgen/ppm.h
+../../utils/fft/FFT.o: ../../utils/fft/FFT.h

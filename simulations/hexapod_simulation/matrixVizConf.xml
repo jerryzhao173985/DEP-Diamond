@@ -1,12 +1,11 @@
 <!DOCTYPE MatrixVizConfigFile>
 <MatrixVizConfiguration>
- <MatrixVizWindow X="691" Y="19"/>
- <VisualisationWindow width="300" mode="vector" X="1150" Y="30" visMode="0" height="300" source="x" colorPaletteFile=""/>
- <VisualisationWindow width="300" mode="vector" X="837" Y="27" visMode="0" height="300" source="y" colorPaletteFile=""/>
- <VisualisationWindow width="300" mode="matrix" X="540" Y="674" visMode="0" height="296" source="M1" colorPaletteFile=""/>
- <VisualisationWindow width="300" mode="matrix" X="842" Y="673" visMode="0" height="296" source="C1" colorPaletteFile=""/>
- <VisualisationWindow width="300" mode="matrix" X="542" Y="354" visMode="0" height="291" source="M2" colorPaletteFile=""/>
- <VisualisationWindow width="300" mode="matrix" X="842" Y="355" visMode="0" height="293" source="C2" colorPaletteFile=""/>
- <VisualisationWindow width="300" mode="matrix" X="1143" Y="356" visMode="0" height="286" source="C_avg2" colorPaletteFile=""/>
- <VisualisationWindow width="300" mode="matrix" X="1143" Y="667" visMode="0" height="300" source="C_avg1" colorPaletteFile=""/>
+ <MatrixVizWindow X="-10" Y="19"/>
+ <VisualisationWindow width="300" mode="vector" X="245" Y="19" visMode="0" height="300" source="x" colorPaletteFile=""/>
+ <VisualisationWindow width="300" mode="vector" X="-10" Y="19" visMode="0" height="300" source="y" colorPaletteFile=""/>
+ <VisualisationWindow width="300" mode="matrix" X="-10" Y="19" visMode="0" height="296" source="M1" colorPaletteFile=""/>
+ <VisualisationWindow width="300" mode="matrix" X="-10" Y="19" visMode="0" height="296" source="C1" colorPaletteFile=""/>
+ <VisualisationWindow width="300" mode="matrix" X="-10" Y="19" visMode="0" height="293" source="C2" colorPaletteFile=""/>
+ <VisualisationWindow width="300" mode="matrix" X="193" Y="19" visMode="0" height="286" source="C_avg2" colorPaletteFile=""/>
+ <VisualisationWindow width="300" mode="matrix" X="193" Y="19" visMode="0" height="300" source="C_avg1" colorPaletteFile=""/>
 </MatrixVizConfiguration>

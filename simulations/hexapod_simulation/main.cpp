@@ -98,9 +98,25 @@
 
 //image processing library for screenshot images Cimg Library.
 #include "../../utils/CImg.h"
+
+
+#include "../../utils/fft/FFT.h"
+// #include <vector>
+
+
+#include <cstdio>
+#include <memory>
+#include <vector>
+
+#include <libff/common/double.hpp>
+#include <libfqfft/evaluation_domain/get_evaluation_domain.hpp>
+using namespace libfqfft;    //using library libff in MakeFile.conf add '-lff'
+
+
+#include <queue>     // get N largest index from std::vector using std::priority_queue
+
+
 using namespace cimg_library;
-
-
 // fetch all the stuff of lpzrobots into scope
 using namespace lpzrobots;
 using namespace matrix;
@@ -172,6 +188,36 @@ CImg<double> invcolli5(1, 1000, 1, 1, 0);
 CImg<double> invcolli6(1, 1000, 1, 1, 0);
 // colli(0, 0) = 0.0;
 bool plot_collision = true;
+
+
+
+//1D FFT (&&2D FFT):
+typedef std::vector<double>::iterator                 vec_d_it;
+typedef std::vector<double>                           vec_d;
+typedef std::vector< std::vector<double> >            vec_vec_d;
+typedef std::vector<std::vector<double> >::iterator   vec_vec_d_it;
+// vec_d         Frequency_R;              // real part of frequency profile
+// vec_d         Frequency_I;              // imaginary part of frequency
+int N_FFT = 1024;              // p=10: 2^p
+// FFT* fft;   // = new FFT(N_FFT, &Frequency_R, &Frequency_I);
+
+// HI.resize(N_FFT);  //NOTE: you should put resize() function inside a constructor!
+
+std::vector<FFT*> fftx;            /* fft structure to compute the FFT */
+int nx = 10;    // maximum buffer for time-horizons
+// std::vector<FFT*> ffty;            /* fft structure to compute the FFT */
+vec_vec_d         Frequency_R;              /* frequency domain, real part      - [y][x] */
+vec_vec_d         Frequency_I;              /* frequency domain, imaginary part - [y][x] */
+
+vec_vec_d         hr;              /* time domain, real part      - [y][x] */
+vec_vec_d         hi;              /* time domain, imaginary part - [y][x] */
+
+
+//NEW LIBRARY for FFT
+CImg<double> data_original_R(1, N_FFT, 1, 1, 0);   // original
+std::vector<libff::Double> f(N_FFT);                      //current dynamic(time/frequency)
+std::vector<double> normalized_amp(N_FFT/2);                //normalized frequency amplitude from FFT
+
 
 
 void map_gen(int seed) {
@@ -341,6 +387,9 @@ public:
       fclose(pFile);
       
     }
+
+    //Free memory.
+    for(int i=0 ; i<nx ; i++) delete fftx[i];
   }
 
 
@@ -713,6 +762,34 @@ public:
         sine->setParam("amplitude10", 0.8);
       }
     }
+
+
+    //MARK: set other parameters (Initialization) in this start() function!
+    // Initialize two 2D vectors(arrays) Frequency_R(_I)
+    // HR.resize(nx+1); 
+    // for(vec_vec_d_it it=HR.begin() ; it!=HR.end() ; it++) it->resize(ny+1);
+    Frequency_R.resize(nx);
+    Frequency_I.resize(nx);
+    for(vec_vec_d_it it=Frequency_R.begin() ; it!=Frequency_R.end() ; it++) it->resize(N_FFT);
+    for(vec_vec_d_it it=Frequency_I.begin() ; it!=Frequency_I.end() ; it++) it->resize(N_FFT);
+
+    // fft = new FFT(N_FFT, &Frequency_R, &Frequency_I);   //1D FFT initialization
+    // ffty.reserve(nx);
+    // for(int i=0 ; i<nx ; i++) ffty.push_back(new FFT(ny, &HR[i], &HI[i]));
+    
+    fftx.reserve(nx);
+    for(int i=0 ; i<nx ; i++) fftx.push_back(new FFT(N_FFT, &Frequency_R[i], &Frequency_I[i]));
+
+
+    hr.resize(nx);
+    hi.resize(nx);
+    for(vec_vec_d_it it=hr.begin() ; it!=hr.end() ; it++) it->resize(N_FFT);
+    for(vec_vec_d_it it=hi.begin() ; it!=hi.end() ; it++) it->resize(N_FFT);
+
+
+    f[0] = libff::Double(0.);
+    data_original_R(0,0) = 1.;
+    
   }
 
   virtual void setModel(OdeAgent* agent){
@@ -1170,7 +1247,185 @@ public:
         inv_snap.save_bmp(inv_szFileName);
       }
     }
+
+    //MARK: //COMMENT OUT THIS PREVIOUS FFT ATTEMPT
+    // //adding the FFT for position (x,y) information buffer
+    // // if(globalData.sim_step%10==0){
+    // Diamond* diamond_fft = dynamic_cast<Diamond*>(globalData.agents[0]->getController());
+    // int N1 = globalData.sim_step / N_FFT; 
+    // Frequency_R[N1][globalData.sim_step%N_FFT] = diamond_fft->get_internal_layers()[0]->getLastMotorValues().val(10,0);
+    // Frequency_I[N1][globalData.sim_step%N_FFT] = 0.0;
+    // // std::cout<< Frequency_R[N1][globalData.sim_step%N_FFT] << std::endl;
+    // // }
+    // /*Direct FFT transform. The algorithm computes the spectrum for the time-domain signal 
+    // in the real and imag vectors, and stores the result in these same vectors. -->direct()*/
+    // bool plot_FFT = false; //plot_collision;
+
+    // if(plot_FFT){
+    //   if(globalData.sim_step%(N_FFT/* *10 */)==0){  //after FFT/10 seconds
+    //     //store the time-domain data plot first before doing FFT direct()
+    //     int x;
+    //     vec_d_it it;
+    //     for(it=hr[N1].begin(), x=0 ; it!=hr[N1].end() ; it++, x++) *it = Frequency_R[N1][x];
+    //     for(it=hi[N1].begin(), x=0 ; it!=hi[N1].end() ; it++, x++) *it = Frequency_I[N1][x]; 
+        
+    //     fftx[N1]->direct();
+        
+    //     std::vector<double>* ss; 
+    //     std::vector<double>* sss;
+    //     ss =  fftx[N1]->get_real();
+    //     sss =  fftx[N1]->get_imag();
+        
+        
+    //     std::cout << BOLDBLACK<< "------Plot FFT------" <<RESET<< std::endl;        
+    //     CImg<unsigned char> visu_fft(500,400,1,3,0);
+    //     const unsigned char red1[] = { 255,0,0 }, blue1[] = {0,0,255};
+    //     CImgDisplay draw_disp_fft(visu_fft,"Frequency plot visualization");
+        
+    //     //buffer for plot
+    //     CImg<double> data_fft_R(1, N_FFT, 1, 1, 0); 
+    //     CImg<double> data_fft_I(1, N_FFT, 1, 1, 0);
+        
+    //     for(int i=0; i<N_FFT; i++){
+    //       data_fft_R(0,i) = (double) ss->at(i);  //Frequency_R[N1][i];  //hr[N1][i];    //Frequency_R[N1][i];
+    //       // std::cout<< Frequency_R[N1][i] << std::endl;
+    //       //std::cout<< hr[N1][i] << std::endl;
+    //       std::cout<< ss->at(i) <<std::endl;
+    //       data_fft_I(0,i) = (double) sss->at(i);  //Frequency_I[N1][i];  //hi[N1][i];    //Frequency_I[N1][i];
+    //     }
+    //     while (!draw_disp_fft.is_closed()) {
+    //       visu_fft.fill(0).draw_graph(data_fft_R, red1, 1 ,1 ,-1., 1., 0).draw_graph(data_fft_I, blue1, 1 ,1 ,-1., 1., 0).display(draw_disp_fft); //,false,0,true);
+    //     }
+        
+    //     //clear the vector buffer and set to 0 again
+    //     // Frequency_R.clear();
+    //     // Frequency_I.clear();
+    //     // Frequency_R.resize(N_FFT);
+    //     // Frequency_I.resize(N_FFT);
+
+    //   }
+    // } 
     
+
+    int N1 = globalData.sim_step / N_FFT; 
+    
+    // f.push_back(libff::Double(last_motor_value));   //if here use push_back, later on should use clear()
+
+    // if (globalData.sim_step%10==0) std::cout<< diamond_fft->get_internal_layers()[0]->getLastMotorValues().val(0,0) <<std::endl;
+    // if (globalData.sim_step%10==0) std::cout<< Frequency_R[N1][globalData.sim_step%N_FFT] <<std::endl;
+    bool plot_FFT = plot_collision;
+    if(plot_FFT){
+      if(globalData.sim_step%(N_FFT)==0){  //after FFT/10 seconds
+        //store the time-domain data plot first before doing FFT direct()
+        // f.resize(N_FFT);
+        // for(int i=0; i<N_FFT; i++){
+        //   data_original_R(0,i) = Frequency_R[N1][i];  //(1 , 3)
+        //   f[i]=libff::Double(Frequency_R[N1][i]);
+        // }
+        //FFT using NEW libff library
+        size_t m = N_FFT;
+        /* Get evaluation domain */
+        std::shared_ptr<evaluation_domain<libff::Double> > domain = get_evaluation_domain<libff::Double>(m);
+        /* FFT */
+        domain->FFT(f);
+        // int Ii=1000;   //for test value
+        // printf("Last Magnitude: %0.1f, (%0.1f, %0.1f)\n", std::sqrt(f[Ii].val.real() *f[Ii].val.real() +f[Ii].val.imag()* f[Ii].val.imag()), f[Ii].val.real(), f[Ii].val.imag());
+        
+        //MARK: Calculate some data evaluation metrics before doing the plot!
+        //Calculate the mean frequency to determine a rough frequency of this 10s MAYBE can also calculater the frequency entropy!
+        int MEDIUM_SAMPLE = 500;
+        int SAMPLE_START = (int) (N_FFT - MEDIUM_SAMPLE)/2;
+        std::vector<double> medium_freq(MEDIUM_SAMPLE);
+        for(int i=0; i<MEDIUM_SAMPLE; i++)  medium_freq[i] = std::sqrt(f[SAMPLE_START+i].val.real() *f[SAMPLE_START+i].val.real() +f[SAMPLE_START+i].val.imag()* f[SAMPLE_START+i].val.imag()) * .1;
+        double average = std::accumulate( medium_freq.begin(), medium_freq.end(), 0.0) / (double) medium_freq.size(); 
+        std::cout << "The Mean Medium Frequency is: " << average << std::endl;
+        
+        // double LogEntropy = 0.0;
+        double weighted_freq = 0.0;
+        double amp_sum = std::accumulate( medium_freq.begin(), medium_freq.end(), 0.0);
+        for(int i=0; i<MEDIUM_SAMPLE; i++) {
+          weighted_freq += (medium_freq[i]/amp_sum) * ((double) (SAMPLE_START+i));
+          // LogEntropy += (medium_freq[i]/amp_sum) * std::log((medium_freq[i]/amp_sum));
+        }
+        std::cout << "The LOG Entropy for Medium Frequency is: " << weighted_freq << std::endl;    
+        
+        // GET N largest Frequenmcy in the middle!
+        int N_LARGEST = 10;    // number of indices we need
+        std::priority_queue<std::pair<double, int> > q;
+        for (int i = 0; i < medium_freq.size(); ++i) {
+          q.push(std::pair<double, int>(medium_freq[i], i));
+        }
+        for (int i = 0; i < N_LARGEST; ++i) {
+          int ki = q.top().second;
+          std::cout << "index[" << i << "] = " << ki << std::endl;
+          q.pop();
+        }
+
+        //cluster these top areas from i~(200, 300), with each section a window of 10 within calculate the mean
+        double window_sum;
+        for(int i=0; i<10; i++){
+          vec_d_it first = medium_freq.begin() + 200+i*10;         //typedef std::vector<double>::iterator  vec_d_it;
+          vec_d_it last = medium_freq.begin() + 200+(i+1)*10 + 1;  //get the subvector start and end pointer
+          std::vector<double> subvector_freq(first, last);
+          window_sum =   std::accumulate( subvector_freq.begin(), subvector_freq.end(), 0.0);
+          std::cout << "SUM of window ("<<SAMPLE_START+200+i*10<<", "<<SAMPLE_START+200+(i+1)*10<<") is: "<< window_sum  <<std::endl;
+        }
+
+
+      
+        std::cout << BOLDBLACK<< "------Plot FFT------" <<RESET<< std::endl;        
+        CImg<unsigned char> visu_fft(2048,1024,1,3,0);
+        const unsigned char red1[] = { 255,0,0 }, blue1[] = {0,0,255};
+        CImgDisplay draw_disp_fft(visu_fft,"Frequency plot visualization");  
+        //buffer for plot
+        CImg<double> data_fft_R(1, N_FFT, 1, 1, 0); 
+        CImg<double> data_fft_I(1, N_FFT, 1, 1, 0);
+        CImg<double> data_fft_amp(1, N_FFT, 1, 1, 0);  //Sufficient for analysis: Amplitute for conplex vector if you only care about intensity
+        
+        // double check_summation_normalization = 0.0;
+        for(int i=0; i<N_FFT; i++){
+          data_fft_R(0,i) =  f[i].val.real();   
+          data_fft_I(0,i) =  f[i].val.imag();
+          if(i<N_FFT/2){
+            data_fft_amp(0,i) =  std::sqrt(f[i].val.real() *f[i].val.real() +f[i].val.imag()* f[i].val.imag()) ;
+            data_fft_amp(0,i) =  (data_fft_amp(0,i)/ (double) N_FFT ); //* 2.;  //*= 0.1   //Normalize the amplitude to (0,1), then enlarge to (0, 2) for visualization!
+            normalized_amp[i] =  data_fft_amp(0,i);  // store this normalized value in order to calculate frequency entropy later 
+            // check_summation_normalization += data_fft_amp(0,i); //Correct! // The summation before *2 is summed up to approx 1;
+            data_fft_amp(0,i) =  data_fft_amp(0,i) * 10.;  // Purely for visualization
+          }
+          if(i>=N_FFT/2)  data_fft_amp(0,i) = 0.;
+        }
+
+        std::cout<<"Accumulation of normalized frequncy amplitude: " <<   std::accumulate( normalized_amp.begin(), normalized_amp.end(), 0.0)   <<std::endl;
+        double LogEntropy = 0.0;
+        for(int i=0; i<N_FFT/2; i++) {
+          LogEntropy += normalized_amp[i] * std::log(normalized_amp[i]);
+        }
+        LogEntropy = -LogEntropy;   //Negative LOG entropy is positive value;
+        std::cout<<"LogEntropy of normalized frequncy amplitude: " <<   LogEntropy   <<std::endl;
+        
+
+        while (!draw_disp_fft.is_closed()) {
+          visu_fft.fill(255).draw_graph(data_original_R, red1, 1 ,1 ,0., 2., 0).draw_graph(data_fft_amp, blue1, 1 ,1 ,0., 2., 0).display(draw_disp_fft);  //NOTE: the y_min should be greater than 0.0!!
+          //draw_graph(data_fft_R, red1, 1 ,1 ,-5., 5., 0).draw_graph(data_fft_I, blue1, 1 ,1 ,-5., 5., 0).display(draw_disp_fft); //,false,0,true);
+        }
+
+        // f.clear(); 
+        
+        
+        
+
+      }
+    }
+
+    //Make assigning the value after the plot! To assign new values to 0 location.
+    Diamond* diamond_fft = dynamic_cast<Diamond*>(globalData.agents[0]->getController());
+    double last_motor_value = diamond_fft->get_internal_layers()[0]->getLastMotorValues().val(0,0);
+    // Frequency_R[N1][globalData.sim_step%N_FFT] = last_motor_value;
+    data_original_R(0,globalData.sim_step%N_FFT) = last_motor_value + 1.0;   // Here +1.0 is only for visualization of the original time-domain sin curve 
+    f[globalData.sim_step%N_FFT] = libff::Double(last_motor_value);
+
+
 
 
   }
@@ -1516,6 +1771,25 @@ public:
 
 int main (int argc, char **argv)
 {
+  //------------------test third-party library code-----------------------------
+  // std::complex<double> aa = std::complex<double>( 1., 2. );
+  /* Polynomial Evaluation */
+  /* Domain size */
+  size_t m = 4;
+  /* Evaluation vector */
+  //std::complex<double> z4 = 1. + 2i, z5 = 1. - 2i; // conjugates C++14 directly using 'i'
+  std::vector<libff::Double> f = { std::complex<double>( 1., 2. ), std::complex<double>( -1., 2. ), std::complex<double>( 1., 2. ), std::complex<double>( -1., 2. )}; //2. + 2i, 5. - 2i, 3, 8 };
+  /* Get evaluation domain */
+  std::shared_ptr<evaluation_domain<libff::Double> > domain = get_evaluation_domain<libff::Double>(m);
+  /* FFT */
+  domain->FFT(f);
+  for (size_t i = 0; i < f.size(); i++)
+  {
+    printf("%ld: %ld\n", i, f[i].as_ulong());     //as_long(){round(var.real())}  unsigned long Double::as_ulong() const{return round(val.real());}
+    // std::cout<< f[i].val<<std::endl;
+    printf("Magnitude: %0.1f, (%0.1f, %0.1f)\n", i, std::sqrt(f[i].val.real() *f[i].val.real() +f[i].val.imag()* f[i].val.imag()), f[i].val.real(), f[i].val.imag());
+  }
+
 
   int index = Simulation::contains(argv,argc,"-numwalls");
   if(index >0 && argc>index){

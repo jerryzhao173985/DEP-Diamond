@@ -65170,9 +65170,9 @@ namespace cil = cimg_library_suffixed;
 #ifdef _cimg_redefine_max
 #define max(a,b) (((a)>(b))?(a):(b))
 #endif
-#ifdef _cimg_redefine_PI
+/*#ifdef _cimg_redefine_PI
 #define PI 3.141592653589793238462643383
-#endif
+#endif*/
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
