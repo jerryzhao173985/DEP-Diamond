@@ -207,6 +207,24 @@ public:
   virtual matrix::Matrix* getpEvRe(){  return &eigenvaluesLRe;}
   virtual matrix::Matrix getL(){  return L; }
   virtual matrix::Matrix* getpL(){  return &L;}
+
+  virtual matrix::Matrix get_x(){  return x_temporal; }
+  virtual matrix::Matrix* get_px(){  return &x_temporal;}
+  virtual matrix::Matrix get_y(){  return y_temporal; }
+  virtual matrix::Matrix* get_py(){  return &y_temporal;}
+
+  // virtual void setx_temporal(const matrix::Matrix& _x_temporal){
+  //   assert(x_temporal.getM() == _x_temporal.getM() && x_temporal.getN() == _x_temporal.getN());
+  //   x_temporal=_x_temporal;
+  // }
+
+  // virtual void sety_temporal(const matrix::Matrix& _y_temporal){
+  //   assert(y_temporal.getM() == _y_temporal.getM() && y_temporal.getN() == _y_temporal.getN());
+  //   y_temporal=_y_temporal;
+  // }
+  virtual matrix::Matrix geth(){  return h; }
+  virtual matrix::Matrix getx_smooth(){  return x_smooth; }
+
   
   virtual void setM(const matrix::Matrix& _M){
     assert(M.getM() == _M.getM() && M.getN() == _M.getN());
@@ -309,6 +327,11 @@ protected:
   matrix::Matrix x_smooth; // time average of x values
   matrix::Matrix normmot; // factors for individual normalization
   //matrix::Matrix y_smooth;  //I define this to use for calculate the prediction action state, and prediction action error
+
+
+  matrix::Matrix x_temporal;    //adding temporal x and y sequence for visualization for every layer
+  matrix::Matrix y_temporal;    //adding temporal x and y sequence for visualization for every layer
+  
 
 
   matrix::Matrix eigenvaluesLRe; //Eigenvalues of L matrix real part

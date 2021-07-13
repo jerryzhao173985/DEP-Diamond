@@ -64,6 +64,9 @@ void Diamond::init(int sensornumber, int motornumber, RandGen* randGen){
     addInspectableMatrix("M"+to_string(i+1), internal_layer[i]->getpM(), false, "inverse model matrix of layer"+to_string(i+1));
     addInspectableMatrix("C"+to_string(i+1), internal_layer[i]->getpC(), false, "controller matrix of layer "+to_string(i+1));
     addInspectableMatrix("C_avg"+to_string(i+1), internal_layer[i]->getpC_avg(), false,  "Average C controller matrix for feet"+to_string(i+1));
+
+    addInspectableMatrix("x"+to_string(i+1), internal_layer[i]->get_px(), false, "sensor values for layer " +to_string(i+1));
+    addInspectableMatrix("y"+to_string(i+1), internal_layer[i]->get_py(), false,  "motor values for layer " +to_string(i+1));
     
     // addInspectableMatrix("L"+to_string(i+1), internal_layer[i]->getpL(), false, "Jacobian matrix of layer"+to_string(i+1));
     // addInspectableMatrix("EvRe"+to_string(i+1), internal_layer[i]->getpEvRe(), false, "Eigenvalue Real Part of layer"+to_string(i+1));
@@ -148,6 +151,7 @@ void Diamond::step(const sensor* x_, int number_sensors,
       if (i == 0) {
         x.set(number_sensors,1,x_); // x^prime_0 
         x_l = x;  // First layer it is copy
+        // internal_layer[0]->setx_temporal(x);   //MARK: store the first layer input directly-----!!NOW solve this by adding both in Step() and StepMV()!
       }
       // besides the first layer input a copy, the higher level should be prediction or error that cannot predicted
       // or it could be features extracted from the first layer
@@ -185,7 +189,10 @@ void Diamond::step(const sensor* x_, int number_sensors,
         
         if (i == 0) {
           for (int j = 0; j < number_motors; j++)
-            y_[j] = y_discard[j]; 
+            y_[j] = y_discard[j];
+          
+          // matrix::Matrix yy_initial;  // yy_initial.set(number_motors, 1, y_discard);    // NOT convertToBuffer(y_discard, number_motors);
+          // internal_layer[0]->sety_temporal(yy_initial);   //MARK: As well for y: store the first layer input directly 
         }
 
       }

@@ -220,6 +220,14 @@ std::vector<double> normalized_amp(N_FFT/2);                //normalized frequen
 
 
 
+
+/// neuron transfer function
+static double g(double z)
+{
+  return tanh(z);
+};
+
+
 void map_gen(int seed) {
 	// Define the size of the image
 	unsigned int width = 256, height = 256;
@@ -1424,6 +1432,9 @@ public:
     // Frequency_R[N1][globalData.sim_step%N_FFT] = last_motor_value;
     data_original_R(0,globalData.sim_step%N_FFT) = last_motor_value + 1.0;   // Here +1.0 is only for visualization of the original time-domain sin curve 
     f[globalData.sim_step%N_FFT] = libff::Double(last_motor_value);
+
+    std::cout<<  diamond_fft->get_internal_layers()[0]->getLastMotorValues().val(0,0) << " , "<< diamond_fft->get_internal_layers()[1]->getLastMotorValues().val(0,0) 
+      <<" , "<< ((diamond_fft->get_internal_layers()[0]->getC() * diamond_fft->get_internal_layers()[0]->get_x()+diamond_fft->get_internal_layers()[0]->geth()).map(g)).val(0,0) <<" , "  <<std::endl;
 
 
 

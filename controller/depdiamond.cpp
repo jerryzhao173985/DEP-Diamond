@@ -125,6 +125,10 @@ void DEPDiamond::init(int sensornumber, int motornumber, RandGen* randGen){
 
   y_teaching.set(number_motors, 1);
 
+  //For visualization for every layer
+  x_temporal.set(number_sensors,1);
+  y_temporal.set(number_motors,1);
+
 }
 
 
@@ -334,6 +338,10 @@ void DEPDiamond::step(const sensor* x_, int number_sensors,
   t++;
 
   _internWithLearning=false;
+  
+  x_temporal = getLastSensorValues();
+  y_temporal = getLastMotorValues();
+
 };
 
 // // performs one step without learning. Calulates motor commands from sensor inputs.
@@ -421,6 +429,9 @@ void DEPDiamond::stepMV(const sensor* x_, int number_sensors,
   t++;
 
   _internWithLearning=false;
+
+  x_temporal = getLastSensorValues();
+  y_temporal = getLastMotorValues();
 };
 
 
@@ -486,14 +497,18 @@ void DEPDiamond::stepNoLearningMV(const sensor* x_, int number_sensors_robot,
   // Matrix y =   (C*x_smooth  + h  ).map(g);
   // Matrix y =   (C*(x_smooth + (v_avg*creativity)) + h).map(g);
   // TODO: change this! calculate controller values based on current input values (smoothed)
-  Matrix y =   (C*(
-                   x_smooth /* * 0.85 */ +  // (v_avg*creativity) + // x_0
-                   ((C.pseudoInverse())*((dep_l1->getLastMotorValues()).map(g_inv) -h)) * 0.15 // x^tilde_1
-                  //  ( (dep_l1->getM()).pseudoInverse() * (dep_l1->getLastMotorValues()) ) *0.15  // time-loop error
-                  )
-                   //* 0.5)
-                   //).map(sqrt_norm)
-                + h).map(g);  //+ dep_l1->getLastMotorValues()
+  
+  
+  // Matrix y =   (C*(
+  //                  x_smooth /* * 0.85 */ +  // (v_avg*creativity) + // x_0
+  //                  ((C.pseudoInverse())*((dep_l1->getLastMotorValues()).map(g_inv) -h)) * 0.15 // x^tilde_1
+  //                 //  ( (dep_l1->getM()).pseudoInverse() * (dep_l1->getLastMotorValues()) ) *0.15  // time-loop error
+  //                 )
+  //                  //* 0.5)
+  //                  //).map(sqrt_norm)
+  //               + h).map(g);  //+ dep_l1->getLastMotorValues()   
+  
+  Matrix y = dep_l1->getLastMotorValues() + (C * x_temporal/*x_smooth*/+ h).map(g); 
 
   y_buffer[t] = y;
   // Put new output vector in ring buffer y_buffer

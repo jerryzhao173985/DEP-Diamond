@@ -107,6 +107,38 @@ These two models M1 and M2 are set with identity matrix, with a very small learn
 ![2s](demos/2s.gif)                  |  ![normalized](demos/normalized.gif)
 
 
+## **NEW!!** Motion with FFT Analysis
+
+**Hexapod Rotation With Fourier Transformation on Low Level Motion**
+
+
+[![Hexapod Rotation With Fourier Transformation on Low Level Motion](demos/motion/rotate_FFT.gif)](https://youtu.be/QAnbRKkJnTA)
+
+
+Gradually increasing synchronized boost (with CMD option 'b/B') which result to **rapid periodic motion**. But unclear of why other motion such as straight walking gait is so hard to appear in some time period. Maybe the noise too large or the higher level cannot control well, or this identity model favours this motion. Next step: try changing model from identity matrix to other matrices (such as hexapod walking matrix).
+
+<br/>
+
+**Hexapod Walking straight backwards With Fourier Transformation on Low Level Motion**
+
+
+[![Hexapod Stright backwards walking With Fourier Transformation on Low Level Motion](demos/motion/straight_backwards_FFT.gif)](https://youtu.be/_3cwkDGgmoM)
+
+
+
+
+
+##  Foot Gait Analysis
+
+**Foot gait analysis on rotation motion**
+![Foot gait analysis on rotation motion](demos/gait/rotate_gait.png)
+
+**Foot gait analysis on walking motion**
+![Foot gait analysis on walking motion](demos/gait/straight_backwards_gait.png)
+
+
+<br/>
+
 
 ## Videos:
 
