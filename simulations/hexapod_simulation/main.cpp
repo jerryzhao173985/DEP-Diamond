@@ -116,6 +116,9 @@ using namespace libfqfft;    //using library libff in MakeFile.conf add '-lff'
 #include <queue>     // get N largest index from std::vector using std::priority_queue
 
 
+#include "../../utils/wavelet/wavelet_all.hpp"   //wavelet transformation
+
+
 using namespace cimg_library;
 // fetch all the stuff of lpzrobots into scope
 using namespace lpzrobots;
@@ -219,6 +222,25 @@ std::vector<libff::Double> f(N_FFT);                      //current dynamic(time
 std::vector<double> normalized_amp(N_FFT/2);                //normalized frequency amplitude from FFT
 
 
+// bool wavelet_analysis = false;
+//---Wavelet Transformation---- 
+float samplerate_hz(1000.);
+float frequency_min = 0.1;
+float frequency_max = 500.;
+float bands_per_octave = 50;
+// frequency_min(this, frequency_min_, 1e-12, frequency_max_),
+// frequency_max(this, frequency_max_, frequency_min_, samplerate_/2.),
+wavelet::Filterbank cwt1(samplerate_hz,
+                frequency_min,
+                frequency_max,
+                bands_per_octave);
+std::size_t numbands1(cwt1.size());
+
+wavelet::Filterbank cwt2(1000. , 0.1, 500., 50);       //(samplerate_hz, frequency_min, frequency_max, bands_per_octave);
+std::size_t numbands2(cwt2.size());
+
+
+bool wavelet_transform = false;
 
 
 /// neuron transfer function
@@ -797,6 +819,14 @@ public:
 
     f[0] = libff::Double(0.);
     data_original_R(0,0) = 1.;
+
+
+    //wavelet initialization:
+    cwt1.reset(); // Reset processing
+    std::cout<< "Wavelet1 frequency bandwidth: "<< cwt1.size() << std::endl;
+
+    cwt2.reset(); // Reset processing
+    std::cout<< "Wavelet2 frequency bandwidth: "<< cwt2.size() << std::endl;
     
   }
 
@@ -1324,6 +1354,33 @@ public:
     bool plot_FFT = plot_collision;
     if(plot_FFT){
       if(globalData.sim_step%(N_FFT)==0){  //after FFT/10 seconds
+        
+        // MARK: Wrap the following wavelet Transform into CML options 'w/W'
+        // CImg<double> wave_amp(1, cwt.size(), 1, 1, 0);
+        // CImg<unsigned char> wave_visu(2048,1024,1,3,0);
+        // const unsigned char red1[] = { 255,0,0 }, blue1[] = {0,0,255};
+        // CImgDisplay wave_disp(wave_visu,"wave plot visualization");  
+        
+        // double wave_sum = 0.0;
+        // std::cout <<"(";
+        // for (unsigned int band=0; band<numbands; band++) {
+        //   std::complex<double> result = cwt.result_complex[band];
+        //   double amp = std::sqrt(result.real() * result.real() + result.imag() * result.imag());
+        //   std::cout << amp << " , ";
+        //   wave_amp(0, band) = amp;
+        //   wave_sum += amp;
+        // }
+        // std::cout <<")" << std::endl<< std::endl;
+
+        // for (unsigned int band=0; band<numbands; band++) { wave_amp(0, band) = wave_amp(0, band) / wave_sum; }
+
+        // while (!wave_disp.is_closed()) {
+        //   wave_visu.fill(255).draw_graph(wave_amp, red1, 1 ,1 ,0., 0.05, 0).display(wave_disp);  
+        // }
+
+        
+
+
         //store the time-domain data plot first before doing FFT direct()
         // f.resize(N_FFT);
         // for(int i=0; i<N_FFT; i++){
@@ -1433,9 +1490,20 @@ public:
     data_original_R(0,globalData.sim_step%N_FFT) = last_motor_value + 1.0;   // Here +1.0 is only for visualization of the original time-domain sin curve 
     f[globalData.sim_step%N_FFT] = libff::Double(last_motor_value);
 
-    std::cout<<  diamond_fft->get_internal_layers()[0]->getLastMotorValues().val(0,0) << " , "<< diamond_fft->get_internal_layers()[1]->getLastMotorValues().val(0,0) 
+   /* std::cout<<  diamond_fft->get_internal_layers()[0]->getLastMotorValues().val(0,0) << " , "<< diamond_fft->get_internal_layers()[1]->getLastMotorValues().val(0,0) 
       <<" , "<< ((diamond_fft->get_internal_layers()[0]->getC() * diamond_fft->get_internal_layers()[0]->get_x()+diamond_fft->get_internal_layers()[0]->geth()).map(g)).val(0,0) <<" , "  <<std::endl;
+   */
 
+
+    
+    
+    if(wavelet_transform){
+      double value = diamond_fft->get_internal_layers()[0]->getLastMotorValues().val(0,0);// Get data from a stream
+      cwt1.update(value);
+      cwt2.update( diamond_fft->get_internal_layers()[1]->getLastMotorValues().val(0,0) );
+    }
+    
+ 
 
 
 
@@ -1642,6 +1710,78 @@ public:
         std::cout << BOLDCYAN << "This is the config for "<<RED<< "Layer 2: " <<RESET << std::endl;
         Diamond* diamond = dynamic_cast<Diamond*>(global.agents[0]->getController());
         diamond->get_internal_layers()[1]->printConf();
+        break;}
+
+
+        case 'w':{    //Lower case for layer 1: do the Wavelet Transformation
+        
+        CImg<double> wave_amp(1, cwt1.size(), 1, 1, 0);
+        CImg<unsigned char> wave_visu(2048,1024,1,3,0);
+        const unsigned char red1[] = { 255,0,0 }, blue1[] = {0,0,255};
+        CImgDisplay wave_disp(wave_visu,"wave plot visualization");  
+        
+        double wave_sum = 0.0;
+        // std::cout <<"(";
+        for (unsigned int band=0; band<numbands1; band++) {
+          std::complex<double> result = cwt1.result_complex[band];
+          double amp = std::sqrt(result.real() * result.real() + result.imag() * result.imag());
+          // std::cout << amp << " , ";
+          wave_amp(0, band) = amp;
+          wave_sum += amp;
+        }
+        // std::cout <<")" << std::endl<< std::endl;
+
+        for (unsigned int band=0; band<numbands1; band++) { wave_amp(0, band) = wave_amp(0, band) / wave_sum; }
+
+        while (!wave_disp.is_closed()) {
+          wave_visu.fill(255).draw_graph(wave_amp, red1, 1 ,1 ,0., 0.05, 0).display(wave_disp);  
+        }
+
+        CImg<double> snap;
+        wave_disp.snapshot(snap);
+        char szFileName[50] = {0};
+
+        Diamond* diamond = dynamic_cast<Diamond*>(global.agents[0]->getController());
+        double layer1_boost = diamond->get_internal_layers()[0]->get_synboost();
+        
+        sprintf(szFileName, "wave/boost_%.2f_level1_%d.bmp", layer1_boost, global.sim_step);
+        snap.save_bmp(szFileName);
+
+        break;}
+
+        case 'W':{
+        CImg<double> wave_amp(1, cwt2.size(), 1, 1, 0);
+        CImg<unsigned char> wave_visu(2048,1024,1,3,0);
+        const unsigned char red1[] = { 255,0,0 }, blue1[] = {0,0,255};
+        CImgDisplay wave_disp(wave_visu,"wave plot visualization");  
+        
+        double wave_sum = 0.0;
+        // std::cout <<"(";
+        for (unsigned int band=0; band<numbands2; band++) {
+          std::complex<double> result = cwt2.result_complex[band];
+          double amp = std::sqrt(result.real() * result.real() + result.imag() * result.imag());
+          // std::cout << amp << " , ";
+          wave_amp(0, band) = amp;
+          wave_sum += amp;
+        }
+        // std::cout <<")" << std::endl<< std::endl;
+
+        for (unsigned int band=0; band<numbands2; band++) { wave_amp(0, band) = wave_amp(0, band) / wave_sum; }
+
+        while (!wave_disp.is_closed()) {
+          wave_visu.fill(255).draw_graph(wave_amp, red1, 1 ,1 ,0., 0.05, 0).display(wave_disp);  
+        }
+
+        CImg<double> snap;
+        wave_disp.snapshot(snap);
+        char szFileName[50] = {0};
+
+        Diamond* diamond = dynamic_cast<Diamond*>(global.agents[0]->getController());
+        double layer2_boost = diamond->get_internal_layers()[1]->get_synboost();
+        
+        sprintf(szFileName, "wave/boost_%.2f_level2_%d.bmp", layer2_boost, global.sim_step);
+        snap.save_bmp(szFileName);
+
         break;}
 
         // case 'T':{
@@ -1882,6 +2022,12 @@ int main (int argc, char **argv)
 
   with_12_delayed_sensors=false;
   with_12_delayed_sensors = Simulation::contains(argv,argc,"-delayed_sensor")    != 0;
+
+  plot_collision = true;
+  plot_collision = Simulation::contains(argv,argc,"-no_plot")    == 0;
+
+  wavelet_transform = false;
+  wavelet_transform = Simulation::contains(argv,argc,"-wavelet_transform")    != 0;
 
 
   terrain_coverage = false;
