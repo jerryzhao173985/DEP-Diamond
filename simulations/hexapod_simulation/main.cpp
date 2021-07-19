@@ -1497,7 +1497,7 @@ public:
 
     
     
-    if(wavelet_transform){
+    if(wavelet_transform){  //DEBUG: The following takes too much RAM and make the sim speed down even to 0.3
       double value = diamond_fft->get_internal_layers()[0]->getLastMotorValues().val(0,0);// Get data from a stream
       cwt1.update(value);
       cwt2.update( diamond_fft->get_internal_layers()[1]->getLastMotorValues().val(0,0) );
