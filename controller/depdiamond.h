@@ -39,7 +39,8 @@ struct DEPDiamondConf {
     X(DEP,      "DEP") \
     X(DHL,      "DHL") \
     X(HL,       "HL")  \
-    X(ADEP,     "ADEP")
+    X(ADEP,     "ADEP") \
+    X(DIAMONDDEP,     "DIAMONDDEP")
 
   enum LearningRule {
 #define X(Enum, String)       Enum,
@@ -109,7 +110,7 @@ public:
 
   static DEPDiamondConf getDefaultConf(){
     DEPDiamondConf conf;
-    conf.learningRule=DEPDiamondConf::DEP;
+    conf.learningRule=DEPDiamondConf::DIAMONDDEP;  //DEPDiamondConf::DEP;
     conf.initFeedbackStrength = 0;
     conf.steps4Averaging      = 1;
     conf.steps4Delay          = 1;
@@ -321,6 +322,9 @@ protected:
 
   RingBuffer<matrix::Matrix> x_buffer; // buffer needed for delay and derivatives
   RingBuffer<matrix::Matrix> y_buffer; // buffer needed for delay and derivatives
+
+  RingBuffer<matrix::Matrix> M_buffer; // buffer needed for delay and derivatives
+
   // matrix::Matrix y_buffer[buffersize]; // buffer needed for delay
   // matrix::Matrix x_buffer[buffersize]; // buffer of sensor values
 
@@ -360,6 +364,8 @@ protected:
   
   
   int time_average;
+  int Time;
+
   /// learn  model (M = A^T )  // DEBUG: This oringinal comment should be M = A^(-1)
   virtual void learnModel(double eps);
 

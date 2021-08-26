@@ -241,6 +241,11 @@ std::size_t numbands2(cwt2.size());
 
 
 bool wavelet_transform = false;
+bool log_collision = false;
+
+bool log_layer = false;
+
+DiamondConf qc;   //used for storage text log file internal data
 
 
 /// neuron transfer function
@@ -380,7 +385,7 @@ public:
       bool writeHeader;
       FILE* pFile;
       string fileName = /*to_string(layers) +*/ "terrain_coverage.txt";
-      string header = "coverage\tzsize\tdisplacement\tseed\ttime_steps\tstuck_percentage\tentropy\tperiod_coverage";
+      string header = "coverage\tzsize\tdisplacement\tseed\ttime_steps\tstuck_percentage\tentropy\tl1_learningrate\tl2_learningrate\tl1_synboost\tl2_synboost\tperiod_coverage";
       struct stat stFileInfo;
       if ((stat(fileName.c_str(), &stFileInfo) != 0) && (!header.empty())) 
         writeHeader = true;
@@ -401,7 +406,11 @@ public:
           + "\t" + to_string(displacement) + "\t" + to_string(seed) 
           + "\t" + to_string(globalData.sim_step) 
           + "\t" + to_string(stuckness)
-          + "\t" + to_string(coverage_entropy);
+          + "\t" + to_string(coverage_entropy)
+          + "\t" + to_string(qc.params.l1_urate)
+          + "\t" + to_string(qc.params.l2_urate)
+          + "\t" + to_string(qc.params.l1_synboost)
+          + "\t" + to_string(qc.params.l2_synboost);
       
       ss += "\t(";
       for(std::vector<int>::const_iterator i = period_of_coverage.begin(); i != period_of_coverage.end(); ++i) {
@@ -476,6 +485,10 @@ public:
           pcc.params.l1_time_average = (int) std::stoi(value);
         }else if(name=="l2_time_average"){
           pcc.params.l2_time_average = (int) std::stoi(value);
+        }else if(name=="l1_Time"){
+          pcc.params.l1_Time = (int) std::stoi(value);
+        }else if(name=="l2_Time"){
+          pcc.params.l2_Time = (int) std::stoi(value);
         
         }else{
           std::cout<< "some thing in the file cannot be assigned to the simulation controller." <<std::endl;
@@ -696,6 +709,7 @@ public:
         loadParamsintoConf(pc, config_name);
         // checck if DiamondConf is truly updated: 
         //std::cout<< pc.params.l1_epsM << std::endl;
+        qc = pc;   //save the log file data to the global variable for logging out
 
         Diamond* diamond_controller = new Diamond(pc);
         // diamond_controller ->setParam("epsM",0.001);
@@ -1058,19 +1072,20 @@ public:
     // std::cout<<  collsion1_flag <<" ,"<<collsion2_flag<<" ," << collsion3_flag<<" ,"<< collsion4_flag<<" ,"<< collsion5_flag<<" ,"<< collsion6_flag  <<std::endl;
     
 
-
-    FILE* collFile;
-    string collfileName = "collision.txt";
-    collFile = fopen(collfileName.c_str(), "a");
-    string collss;
-    collss = to_string(collision1) 
-        + "\t" + to_string(collision2)
-        + "\t" + to_string(collision3) 
-        + "\t" + to_string(collision4)
-        + "\t" + to_string(collision5)
-        + "\t" + to_string(collision6); 
-    fprintf(collFile, "%s\n", collss.c_str());
-    fclose(collFile);
+    if(log_collision){
+      FILE* collFile;
+      string collfileName = "collision.txt";
+      collFile = fopen(collfileName.c_str(), "a");
+      string collss;
+      collss = to_string(collision1) 
+          + "\t" + to_string(collision2)
+          + "\t" + to_string(collision3) 
+          + "\t" + to_string(collision4)
+          + "\t" + to_string(collision5)
+          + "\t" + to_string(collision6); 
+      fprintf(collFile, "%s\n", collss.c_str());
+      fclose(collFile);
+    }
 
 
 
@@ -1187,6 +1202,7 @@ public:
       fprintf(pFile3, "%s\n", ss3.c_str());
       fclose(pFile3);
     }
+
 
 
     // 2D terrain coverage same as Simon's on four-wheeled robot:
@@ -1502,7 +1518,36 @@ public:
       cwt1.update(value);
       cwt2.update( diamond_fft->get_internal_layers()[1]->getLastMotorValues().val(0,0) );
     }
-    
+
+
+
+    if(globalData.sim_step >= 30000){  //after 5 minutes record the sensor values!
+      //logging out layer informations (actions/sensors) for layer 1 and layer 2
+      if (log_layer) {
+        FILE* pFilelayer1;
+        string fileNamelayer1 = "layer1.txt";
+        pFilelayer1 = fopen(fileNamelayer1.c_str(), "a");
+        string sslayer1;
+        sslayer1 =  "";
+        
+        for(int aa = 0; aa<diamond_fft->getMotorNumber(); aa++){
+          sslayer1 += "\t" + to_string(diamond_fft->get_internal_layers()[0]->get_x().val(aa,0));  // x or y is a colum vector
+        }
+        fprintf(pFilelayer1, "%s\n", sslayer1.c_str());
+        fclose(pFilelayer1);
+
+        
+        FILE* pFilelayer2;
+        string fileNamelayer2 = "layer2.txt";
+        pFilelayer2 = fopen(fileNamelayer2.c_str(), "a");
+        string sslayer2 = "";
+        for(int aa = 0; aa<diamond_fft->getMotorNumber(); aa++){
+          sslayer2 += "\t" + to_string(diamond_fft->get_internal_layers()[1]->get_x().val(aa,0));  // x or y is a colum vector
+        }
+        fprintf(pFilelayer2, "%s\n", sslayer2.c_str());
+        fclose(pFilelayer2);
+      }
+    }  
  
 
 
@@ -2028,6 +2073,12 @@ int main (int argc, char **argv)
 
   wavelet_transform = false;
   wavelet_transform = Simulation::contains(argv,argc,"-wavelet_transform")    != 0;
+
+  log_collision = false;
+  log_collision = Simulation::contains(argv,argc,"-log_collision")  != 0;
+
+  log_layer = false;
+  log_layer = Simulation::contains(argv,argc,"-log_layer")  != 0;
 
 
   terrain_coverage = false;

@@ -56,6 +56,8 @@ DEPDiamond::DEPDiamond(const DEPDiamondConf& conf)
 
   // additional parameters for time-averaging ADEP rule for every layer
   addParameterDef("time_average", &time_average,     1,   0,100, "time-averaging factor for time period in vector outer product in ADEP rule for every layer");
+  // additional parameters for including-Time DIAMONDDEP rule for every layer
+  addParameterDef("Time", &Time,     1,   0,100, "time-averaging factor for time period in vector outer product in DIAMONDDEP rule for every layer");
 
 
   if(conf.calcEigenvalues){
@@ -122,6 +124,8 @@ void DEPDiamond::init(int sensornumber, int motornumber, RandGen* randGen){
 
   x_buffer.init(buffersize, Matrix(number_sensors,1));
   y_buffer.init(buffersize, Matrix(number_motors,1));
+
+  M_buffer.init(buffersize, Matrix(number_motors, number_sensors));
 
   y_teaching.set(number_motors, 1);
 
@@ -527,26 +531,37 @@ void DEPDiamond::stepNoLearningMV(const sensor* x_, int number_sensors_robot,
 
 
 void DEPDiamond::learnController(){
+  // store the M matrix here for use later in the DIAMONDDEP model
+  M_buffer[t] = M;
+
   ///////////////// START of Controller Learning / Update  ////////////////
   int diff = 1;
   Matrix mu;
   Matrix v;
+
+  Matrix updateC;
+
   switch(conf.learningRule){
   case DEPDiamondConf::DEP: { ////////////////////////////
     Matrix chi  = x_buffer[t] - x_buffer[t - diff];
     v = x_buffer[t - timedist] - x_buffer[t - timedist - diff];
     mu = (M * chi);
+    // const Matrix& 
+    updateC =   ( mu ) * (v^T);
     break;
   } // with the '{}' after 'case', scope of 'chi' ends here
-  case DEPDiamondConf::DHL:  ////////////////////////////
+  case DEPDiamondConf::DHL:{  ////////////////////////////
     mu  = y_buffer[t -   diff] - y_buffer[t - 2*diff];
     v = x_buffer[t - timedist] - x_buffer[t - timedist - diff];
+    updateC =   ( mu ) * (v^T);
     break;
-  case DEPDiamondConf::HL:  ////////////////////////////
+  }
+  case DEPDiamondConf::HL:{  ////////////////////////////
     mu = y_buffer[t -   diff];
     v  = x_buffer[t - diff];
+    updateC =   ( mu ) * (v^T);
     break;
-  
+  }
   case DEPDiamondConf::ADEP: {
     // std::cout << "time_average  " <<time_average <<std::endl;
     // int time_average = 5;
@@ -562,13 +577,40 @@ void DEPDiamond::learnController(){
     }
 
     mu = (M * ch);
+    updateC =   ( mu ) * (v^T);
     break;
   } // with the '{}' after 'case', scope of 'ch' ends here
+
+  case DEPDiamondConf::DIAMONDDEP: { ////////////////////////////
+    // std::cout << "Time  " <<Time <<std::endl;
+    Matrix chis[100];
+    Matrix vs[100];
+    Matrix mus[100];
+
+    for(int i=0; i<Time; i++){
+      chis[i] = x_buffer[t-i] - x_buffer[t - diff -i];
+      vs[i] = x_buffer[t - timedist -i] - x_buffer[t - timedist - diff -i];
+      mus[i] = (M_buffer[i] * chis[i]);
+    }
+    // Matrix chi  = x_buffer[t] - x_buffer[t - diff];
+    // v = x_buffer[t - timedist] - x_buffer[t - timedist - diff];
+    // mu = (M * chi);
+
+    updateC.set(number_motors, number_sensors);
+    updateC.toZero();
+    // C.set(number_motors, number_sensors);
+    // std::cout << (1./Time) << std::endl;
+    for(int i=0; i<Time; i++){
+      updateC += ( ( mus[i] ) * ((vs[i])^T) ) * (1./Time);  //average vector outer product
+    }
+    break;
+  } // with the '{}' after 'case', scope of 'chi' ends here
 
   default:
     cerr << "unkown learning rule!" << endl;
   }
-  const Matrix& updateC =   ( mu ) * (v^T);
+  
+  // const Matrix& updateC =   ( mu ) * (v^T);
 
 
   if ( t > 10){
