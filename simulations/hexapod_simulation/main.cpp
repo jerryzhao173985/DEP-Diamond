@@ -385,7 +385,7 @@ public:
       bool writeHeader;
       FILE* pFile;
       string fileName = /*to_string(layers) +*/ "terrain_coverage.txt";
-      string header = "coverage\tzsize\tdisplacement\tseed\ttime_steps\tstuck_percentage\tentropy\tl1_learningrate\tl2_learningrate\tl1_synboost\tl2_synboost\tperiod_coverage";
+      string header = "coverage\tzsize\tdisplacement\tseed\ttime_steps\tstuck_percentage\tentropy\tl1_learningrate\tl2_learningrate\tl1_synboost\tl2_synboost\tl1_TIME\tl2_TIME\tperiod_coverage";
       struct stat stFileInfo;
       if ((stat(fileName.c_str(), &stFileInfo) != 0) && (!header.empty())) 
         writeHeader = true;
@@ -410,7 +410,9 @@ public:
           + "\t" + to_string(qc.params.l1_urate)
           + "\t" + to_string(qc.params.l2_urate)
           + "\t" + to_string(qc.params.l1_synboost)
-          + "\t" + to_string(qc.params.l2_synboost);
+          + "\t" + to_string(qc.params.l2_synboost)
+          + "\t" + to_string(qc.params.l1_Time)
+          + "\t" + to_string(qc.params.l2_Time);
       
       ss += "\t(";
       for(std::vector<int>::const_iterator i = period_of_coverage.begin(); i != period_of_coverage.end(); ++i) {

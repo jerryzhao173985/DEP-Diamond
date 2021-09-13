@@ -40,7 +40,8 @@ struct DEPDiamondConf {
     X(DHL,      "DHL") \
     X(HL,       "HL")  \
     X(ADEP,     "ADEP") \
-    X(DIAMONDDEP,     "DIAMONDDEP")
+    X(DIAMONDDEP,     "DIAMONDDEP")\
+    X(DEPCTM,     "DEPCTM")
 
   enum LearningRule {
 #define X(Enum, String)       Enum,
@@ -110,7 +111,7 @@ public:
 
   static DEPDiamondConf getDefaultConf(){
     DEPDiamondConf conf;
-    conf.learningRule=DEPDiamondConf::DIAMONDDEP;  //DEPDiamondConf::DEP;
+    conf.learningRule= DEPDiamondConf::DEPCTM; // DEPDiamondConf::DIAMONDDEP;  //DEPDiamondConf::DEP;
     conf.initFeedbackStrength = 0;
     conf.steps4Averaging      = 1;
     conf.steps4Delay          = 1;

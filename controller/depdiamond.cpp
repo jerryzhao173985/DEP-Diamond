@@ -606,6 +606,43 @@ void DEPDiamond::learnController(){
     break;
   } // with the '{}' after 'case', scope of 'chi' ends here
 
+  
+  
+  case DEPDiamondConf::DEPCTM: { // DEP with cross time mapping
+
+    Matrix chis[100];
+    Matrix vs[100];
+    Matrix mus[100];
+
+    for(int i=0; i<Time; i++){
+      chis[i] = x_buffer[t-i] - x_buffer[t - diff -i];
+      vs[i] = x_buffer[t - timedist -i] - x_buffer[t - timedist - diff -i];
+      mus[i] = (M_buffer[i] * chis[i]);
+    }
+    
+    
+    Matrix chi  = x_buffer[t] - x_buffer[t - diff];
+    v = x_buffer[t - timedist] - x_buffer[t - timedist - diff];
+    mu = (M * chi);
+    
+    updateC =   ( mu ) * (v^T);
+    
+    Matrix Lambda;
+    Lambda.set(number_sensors, number_sensors);
+    Lambda.toZero();
+
+    for(int i=0; i<Time; i++){ 
+      Lambda += ( ( vs[i] ) * ((vs[i])^T) ) * (1./Time);  //average vector outer product
+    }
+
+
+    updateC = updateC * Lambda.pseudoInverse();
+
+    break;
+  } // with the '{}' after 'case', scope of 'chi' ends here
+
+
+
   default:
     cerr << "unkown learning rule!" << endl;
   }

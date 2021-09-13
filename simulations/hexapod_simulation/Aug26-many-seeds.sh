@@ -5,11 +5,11 @@
 rm -r data
 mkdir data
 
-for seed in {1..1000}
+for seed in {1..10}
 do
   mkdir data/seed$seed
   number=$RANDOM
-  for trial in {1..10}
+  for trial in {1..100}
   do
     echo TRIAL $trial/10
     echo ./start -diamond -layers 2 -period 2 -config $1/config_trail$trial.txt -simtime $2 -playground 0.01 -terrain 1 -seed $number -realtimefactor 0 -nographics -terrain_coverage -no_plot
