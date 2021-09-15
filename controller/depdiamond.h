@@ -257,9 +257,14 @@ public:
   virtual void set_synboost(double _synboost){
     synboost = _synboost;
   }
+  virtual double get_Time(){  return Time;  }
+  virtual void set_Time(double _Time){
+    Time = _Time;
+  }
 
   virtual void printConf(){
     std::cout<< "The synboost is: "<< synboost <<std::endl;
+    std::cout<< "The time period T is: "<< Time <<std::endl;
     std::cout<< "The learning rate is: "<< urate <<std::endl;
     std::cout<< "The epsM is: "<< epsM <<std::endl;
     std::cout<< "The epsh is: "<< epsh <<std::endl;

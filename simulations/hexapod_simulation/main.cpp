@@ -1119,7 +1119,14 @@ public:
       dia->set_coverage(param_coverage);
     }
     // if(passing_coverage_to_internal_param)
-    setTitle("Coverage: " + to_string(coverage));
+
+    //set title containing inportant information
+    Diamond* diamond_now = dynamic_cast<Diamond*>(globalData.agents[0]->getController());
+    double boost_layer1 = diamond_now->get_internal_layers()[0]->get_synboost();
+    double boost_layer2 = diamond_now->get_internal_layers()[1]->get_synboost();
+    double Time_layer1 = diamond_now->get_internal_layers()[0]->get_Time();
+    double Time_layer2 = diamond_now->get_internal_layers()[1]->get_Time();
+    setTitle("Cov: " + to_string(coverage) + "Syn:(" + to_string(boost_layer1)+ ", " + to_string(boost_layer2) + "T:(" + to_string(Time_layer1)+ ", " + to_string(Time_layer2));
 
 
     // print out the terrain coverage status every 5 minutes to show development of the controller:
@@ -1767,6 +1774,34 @@ public:
         double boost = diamond->get_internal_layers()[1]->get_synboost();
         diamond->get_internal_layers()[1]->set_synboost(boost+0.05);
         std::cout<< BLUE << "Now the synboost for "<<RED<< "layer 2" << BLUE<<" is: " << boost+0.05 << RESET<< std::endl;
+        break;}
+
+        case 'a':{  //increase the time period T (Time)
+        Diamond* diamond = dynamic_cast<Diamond*>(global.agents[0]->getController());
+        int TTime = diamond->get_internal_layers()[0]->get_Time();
+        diamond->get_internal_layers()[0]->set_synboost(TTime+10);
+        std::cout<< BLUE << "Now the synboost for "<<RED<<"layer 1" << BLUE<<" is: " << TTime+10 << RESET<< std::endl;
+        break;}
+
+        case 'A':{
+        Diamond* diamond = dynamic_cast<Diamond*>(global.agents[0]->getController());
+        int TTime = diamond->get_internal_layers()[1]->get_synboost();
+        diamond->get_internal_layers()[1]->set_synboost(TTime+10);
+        std::cout<< BLUE << "Now the synboost for "<<RED<< "layer 2" << BLUE<<" is: " << TTime+10 << RESET<< std::endl;
+        break;}
+
+        case 'd':{  //decrease the synboost
+        Diamond* diamond = dynamic_cast<Diamond*>(global.agents[0]->getController());
+        double boost = diamond->get_internal_layers()[0]->get_synboost();
+        diamond->get_internal_layers()[0]->set_synboost(boost-0.05);
+        std::cout<< BLUE << "Now the synboost for "<<RED<<"layer 1" << BLUE<<" is: " << boost-0.05 << RESET<< std::endl;
+        break;}
+
+        case 'D':{
+        Diamond* diamond = dynamic_cast<Diamond*>(global.agents[0]->getController());
+        double boost = diamond->get_internal_layers()[1]->get_synboost();
+        diamond->get_internal_layers()[1]->set_synboost(boost-0.05);
+        std::cout<< BLUE << "Now the synboost for "<<RED<< "layer 2" << BLUE<<" is: " << boost-0.05 << RESET<< std::endl;
         break;}
 
         case 'c':{  //Lower case for layer 1: print out the config
