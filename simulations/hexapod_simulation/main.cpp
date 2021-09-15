@@ -369,7 +369,8 @@ public:
     addColorAliasFile("colors.txt");
     setGroundTexture("Images/whiteground.jpg");
 
-    setCaption("DEP - DIAMOND                 ");
+    setCaption("");  // if not set caption, it'll go to the default Lpzrobot caption
+    // setCaption("DEP - DIAMOND                 ");
     //setCaption("DEP - DIAMOND (Der et al)");
     //setCaption ("Simulator by Martius et al");
 
@@ -1120,13 +1121,7 @@ public:
     }
     // if(passing_coverage_to_internal_param)
 
-    //set title containing inportant information
-    Diamond* diamond_now = dynamic_cast<Diamond*>(globalData.agents[0]->getController());
-    double boost_layer1 = diamond_now->get_internal_layers()[0]->get_synboost();
-    double boost_layer2 = diamond_now->get_internal_layers()[1]->get_synboost();
-    double Time_layer1 = diamond_now->get_internal_layers()[0]->get_Time();
-    double Time_layer2 = diamond_now->get_internal_layers()[1]->get_Time();
-    setTitle("Cov: " + to_string(coverage) + "Syn:(" + to_string(boost_layer1)+ ", " + to_string(boost_layer2) + "T:(" + to_string(Time_layer1)+ ", " + to_string(Time_layer2));
+    
 
 
     // print out the terrain coverage status every 5 minutes to show development of the controller:
@@ -1226,7 +1221,7 @@ public:
     }
 
 
-
+    
     // 2D terrain coverage same as Simon's on four-wheeled robot:
     if (terrain_coverage) {
       Position robot_position = robot->getPosition();
@@ -1248,6 +1243,21 @@ public:
       }
 
     }
+
+    
+    //set title containing inportant information
+    Diamond* diamond_now = dynamic_cast<Diamond*>(globalData.agents[0]->getController());
+    double boost_layer1 = diamond_now->get_internal_layers()[0]->get_synboost();
+    double boost_layer2 = diamond_now->get_internal_layers()[1]->get_synboost();
+    int Time_layer1 = diamond_now->get_internal_layers()[0]->get_Time();
+    int Time_layer2 = diamond_now->get_internal_layers()[1]->get_Time();
+    position = robot->getPosition();
+    char config_chars[150] = {0};    
+    sprintf(config_chars, "Syn:(%.1f,%.1f) T:(%d,%d), Gait(%d,%d,%d,%d,%d,%d), Ang:(%.1f,%.1f,%.1f), Bin:(%d,%d), Z: %.2f", boost_layer1, boost_layer2, Time_layer1, Time_layer2, \
+      collsion1_flag, collsion2_flag, collsion3_flag, collsion4_flag, collsion5_flag, collsion6_flag, angle_xx, angle_yy, angle_zz, bin_x, bin_y, po.z());
+    std::string config_string(config_chars);
+    setTitle("Cov: " + to_string(coverage) + config_string);
+
 
 
     // if (pp(0,2) < -.8) {
@@ -1776,18 +1786,22 @@ public:
         std::cout<< BLUE << "Now the synboost for "<<RED<< "layer 2" << BLUE<<" is: " << boost+0.05 << RESET<< std::endl;
         break;}
 
-        case 'a':{  //increase the time period T (Time)
+        case 'a':{  // both layers increase the time period T (Time)
         Diamond* diamond = dynamic_cast<Diamond*>(global.agents[0]->getController());
         int TTime = diamond->get_internal_layers()[0]->get_Time();
-        diamond->get_internal_layers()[0]->set_synboost(TTime+10);
-        std::cout<< BLUE << "Now the synboost for "<<RED<<"layer 1" << BLUE<<" is: " << TTime+10 << RESET<< std::endl;
+        diamond->get_internal_layers()[0]->set_Time(TTime+5);
+        diamond->get_internal_layers()[1]->set_Time(TTime+5);
+        std::cout<< BLUE << "Now the synboost for "<<RED<< "layer 1" << BLUE<<" is: " << TTime+5 << RESET<< std::endl;
+        std::cout<< BLUE << "Now the synboost for "<<RED<< "layer 2" << BLUE<<" is: " << TTime+5 << RESET<< std::endl;
         break;}
 
-        case 'A':{
+        case 'A':{  // both layers decrease the time period T (Time)
         Diamond* diamond = dynamic_cast<Diamond*>(global.agents[0]->getController());
-        int TTime = diamond->get_internal_layers()[1]->get_synboost();
-        diamond->get_internal_layers()[1]->set_synboost(TTime+10);
-        std::cout<< BLUE << "Now the synboost for "<<RED<< "layer 2" << BLUE<<" is: " << TTime+10 << RESET<< std::endl;
+        int TTime = diamond->get_internal_layers()[1]->get_Time();
+        diamond->get_internal_layers()[0]->set_Time(TTime-5);
+        diamond->get_internal_layers()[1]->set_Time(TTime-5);
+        std::cout<< BLUE << "Now the synboost for "<<RED<< "layer 1" << BLUE<<" is: " << TTime-5 << RESET<< std::endl;
+        std::cout<< BLUE << "Now the synboost for "<<RED<< "layer 2" << BLUE<<" is: " << TTime-5 << RESET<< std::endl;
         break;}
 
         case 'd':{  //decrease the synboost
@@ -1896,6 +1910,27 @@ public:
         case 'G':{
         float grav = global.odeConfig.getParam("gravity");
         global.odeConfig.setParam("gravity", grav-0.5);
+        break;}
+
+        case 's':{
+        global.odeConfig.setParam("realtimefactor", 0);    //default/normal spped is 1.0
+        std::cout << "Simulation speed is: " << global.odeConfig.getParam("realtimefactor") <<std::endl;
+        break;}
+
+        case 'S':{
+        global.odeConfig.setParam("realtimefactor", 1.0);    //default/normal spped is 1.0
+        std::cout << "Simulation speed is: " << global.odeConfig.getParam("realtimefactor") <<std::endl;
+        break;}
+
+        case 'v':{
+        int con_interval = global.odeConfig.getParam("controlinterval");
+        global.odeConfig.setParam("controlinterval", con_interval+1);
+        std::cout << "ControlInterval is: " << con_interval+1 << std::endl;
+        break;}
+        case 'V':{
+        int con_interval = global.odeConfig.getParam("controlinterval");
+        global.odeConfig.setParam("controlinterval", con_interval-1);
+        std::cout << "ControlInterval is: " << con_interval-1 << std::endl;
         break;}
 
 
