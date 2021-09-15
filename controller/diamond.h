@@ -104,7 +104,7 @@ public:
     all_params.l1_urate = 0.05;
     all_params.l1_indnorm = 1;
     all_params.l1_timedist = 4;
-    all_params.l1_learningrule = 0;
+    all_params.l1_learningrule = 5;    // all_params.l1_learningrule = 0;
     all_params.l1_time_average = 1;
     all_params.l1_Time = 1;
 
@@ -114,7 +114,7 @@ public:
     all_params.l2_urate = 0.02;
     all_params.l2_indnorm = 1;
     all_params.l2_timedist = 8;
-    all_params.l2_learningrule = 0;
+    all_params.l2_learningrule = 5;  // all_params.l2_learningrule = 0;
     all_params.l2_time_average = 1;
     all_params.l2_Time = 1;
     
@@ -192,7 +192,7 @@ protected:
   DEPDiamond* make_layer(string base_controller_name); // Factory for base c.
   unsigned short number_sensors;
   unsigned short number_motors;
-  static const unsigned short buffersize = 200;
+  static const unsigned short buffersize = 1000;
 
   DiamondConf conf; ///< configuration objects
 
@@ -209,6 +209,10 @@ protected:
 
   RingBuffer<matrix::Matrix> x_buffer; // buffer needed for delay and derivatives
   RingBuffer<matrix::Matrix> y_buffer; // buffer needed for delay and derivatives
+
+  RingBuffer<matrix::Matrix> x_derivitives; // buffer needed for delay and derivatives
+  matrix::Matrix x_derivitive_average;
+
   // matrix::Matrix y_buffer[buffersize]; // buffer needed for delay
   // matrix::Matrix x_buffer[buffersize]; // buffer of sensor values
   

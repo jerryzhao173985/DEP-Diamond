@@ -133,6 +133,11 @@ void DEPDiamond::init(int sensornumber, int motornumber, RandGen* randGen){
   x_temporal.set(number_sensors,1);
   y_temporal.set(number_motors,1);
 
+
+  x_derivitives.init(buffersize, Matrix(number_sensors,1));
+  x_derivitives_averages.init(buffersize, Matrix(number_sensors,1));
+  x_derivitive_average.set(number_sensors, 1);
+
 }
 
 
@@ -392,8 +397,24 @@ void DEPDiamond::stepNoLearning(const sensor* x_, int number_sensors_robot,
   else
     x_smooth = xrobot;
 
+  // std::cout << t << "  "<< x_buffer[t-1].val(0,0);
   x_buffer[t] = x_smooth;
-  //x_buffer[t%buffersize] = x_smooth; // we store the smoothed sensor value
+
+  // std::cout<< "periodic simulation time step t w.r.t. buffersize" << buffersize << ",  " << t << "  another: "<< (buffersize +t-2)%buffersize <<",  " << x_buffer[1] ;
+  // x_buffer[t%buffersize] = x_smooth; // we store the smoothed sensor value
+  x_derivitives[t] = x_buffer[t] - x_buffer[t-2];
+
+  
+  // 2. calculate x_derivitives MOVING averages and stored in another RingBuffer
+  if (t%10000 ==100){                                            // 100 seconds do a hard update!
+    std::cout<< "hard update on the derivitives!"<< std::endl;
+    x_derivitives_averages[t] = x_derivitives[t];
+  }else{
+    // soft update
+    double update_avg = 0.01; 
+    x_derivitives_averages[t] += (x_derivitives[t] - x_derivitives[t-2]) * update_avg;
+  }
+
 
   if(_internWithLearning)
     learnController();
@@ -486,13 +507,30 @@ void DEPDiamond::stepNoLearningMV(const sensor* x_, int number_sensors_robot,
   Matrix xrobot(number_sensors_robot,1,x_); // store sensor values
 
   // averaging over the last s4avg values of x_buffer
-  if(s4avg > 1)
+  if(s4avg > 1){
+    std::cout << "DANGEROUS!! Average is calculating for the sensor values!!" <<std::endl;
     x_smooth += (xrobot - x_smooth)*(1.0/s4avg);
-  else
+  }else{
+    // std::cout << "SAFE!! Average is NOT calculating for the sensor values!!" <<std::endl;
     x_smooth = xrobot;
+  }
 
   x_buffer[t] = x_smooth;
   //x_buffer[t%buffersize] = x_smooth; // we store the smoothed sensor value
+
+  // 1. calculate x_derivitives and stored in a RingBuffer
+  x_derivitives[t] = x_buffer[t] - x_buffer[t-2];
+
+  // 2. calculate x_derivitives MOVING averages and stored in another RingBuffer
+  if (t%10000 ==100){                                            // 100 seconds do a hard update!
+    std::cout<< "hard update on the derivitives!"<< std::endl;
+    x_derivitives_averages[t] = x_derivitives[t];
+  }else{
+    // soft update
+    double update_avg = 0.01; 
+    x_derivitives_averages[t] += (x_derivitives[t] - x_derivitives[t-2]) * update_avg;
+  }
+
 
   if(_internWithLearning)
     learnController();
@@ -610,15 +648,20 @@ void DEPDiamond::learnController(){
   
   case DEPDiamondConf::DEPCTM: { // DEP with cross time mapping
 
-    Matrix chis[100];
-    Matrix vs[100];
-    Matrix mus[100];
+    Matrix chis[500];
+    Matrix vs[500];
+    Matrix mus[500];
+    // Matrix vs_bar[500];
+    // Matrix v_bar;
 
     for(int i=0; i<Time; i++){
       chis[i] = x_buffer[t-i] - x_buffer[t - diff -i];
       vs[i] = x_buffer[t - timedist -i] - x_buffer[t - timedist - diff -i];
       mus[i] = (M_buffer[i] * chis[i]);
     }
+
+
+    // v_bar +=  ( vs[t+1] - vs[t-1] ) *0.01 ;
     
     
     Matrix chi  = x_buffer[t] - x_buffer[t - diff];
@@ -640,6 +683,66 @@ void DEPDiamond::learnController(){
 
     break;
   } // with the '{}' after 'case', scope of 'chi' ends here
+
+
+  case DEPDiamondConf::DEPZERO: { // y==0
+
+    updateC.set(number_sensors, number_motors);
+    updateC.toZero(); 
+
+    break;
+  } 
+
+  
+  // here in the rules we use x_derivitives_averages
+  case DEPDiamondConf::DEPNEW: { // DEP with cross time mapping
+
+    // x_derivitives[t] = x_buffer[t] - x_buffer[t-2];    
+
+
+    // Matrix chi  = x_derivitives[t];
+    // v = x_derivitives[t-timedist];
+    // updateC =   M * ( chi * (v^T) );
+
+    // Matrix chis[500];
+    // Matrix vs[500];
+
+    // for(int i=0; i<Time; i++){
+    //   chis[i] = x_derivitives[t- i];
+    //   vs[i] = x_derivitives[t-timedist - i];
+    // }
+
+    Matrix chi;
+    chi.set(number_sensors,1);
+    // Matrix average_term;
+    // average_term.set(number_motors, number_sensors);
+    Matrix MM;
+    MM.set(number_motors, number_sensors);     // M.set(number_motors, number_sensors); C.set(number_motors, number_sensors);
+    
+    Matrix Lambda;
+    Lambda.set(number_sensors, number_sensors);
+
+    for(int i=(t-Time); i<t; i++){ 
+      Lambda += ( ( x_derivitives[i] ) * ((x_derivitives[i])^T) ) * (1./Time);  //average vector outer product
+    }
+    
+    updateC.set(number_motors, number_sensors);
+    
+    //using averaged derivitives here in chi and v!
+    for(int i=(t-Time); i<t; i++){            // 0--> T change to (t-T) --> t
+      chi  = x_derivitives_averages[i];       // x_derivitives[i];          // t-i to i   //// or here it could also be i+1
+      v = x_derivitives_averages[i-timedist]; // x_derivitives[i-timedist];
+      MM =  M_buffer[i];
+      // Lambda = ( ( x_derivitives[i-timedist] ) * ((x_derivitives[i-timedist])^T) );
+      updateC += ( ((MM * chi) * (v^T) ) * Lambda.pseudoInverse()) * (1./Time);                 // time averaged on all product
+    }
+    // for(int i=0; i<Time; i++){ 
+    //   Lambda += ( ( x_derivitives[t-timedist-i] ) * ((x_derivitives[t-timedist-i])^T) ) * (1./Time);  //average vector outer product
+    // }
+    // updateC = updateC * Lambda.pseudoInverse();
+
+    break;
+  } 
 
 
 

@@ -41,7 +41,11 @@ struct DEPDiamondConf {
     X(HL,       "HL")  \
     X(ADEP,     "ADEP") \
     X(DIAMONDDEP,     "DIAMONDDEP")\
-    X(DEPCTM,     "DEPCTM")
+    X(DEPCTM,     "DEPCTM")\
+    X(DEPZERO,     "DEPZERO")\
+    X(DEPNEW,     "DEPNEW")\
+
+
 
   enum LearningRule {
 #define X(Enum, String)       Enum,
@@ -282,7 +286,7 @@ public:
 protected:
   unsigned short number_sensors;
   unsigned short number_motors;
-  static const unsigned short buffersize = 200;
+  static const unsigned short buffersize = 1000;
 
   DEPDiamondConf conf; // configuration object
 
@@ -324,6 +328,11 @@ protected:
   RingBuffer<matrix::Matrix> x_buffer; // buffer needed for delay and derivatives
   RingBuffer<matrix::Matrix> y_buffer; // buffer needed for delay and derivatives
 
+  RingBuffer<matrix::Matrix> x_derivitives; // buffer needed for delay and derivatives
+  RingBuffer<matrix::Matrix> x_derivitives_averages;
+  matrix::Matrix x_derivitive_average;
+  
+
   RingBuffer<matrix::Matrix> M_buffer; // buffer needed for delay and derivatives
 
   // matrix::Matrix y_buffer[buffersize]; // buffer needed for delay
@@ -351,7 +360,7 @@ protected:
   paramval epsh;
   paramval epsM;
   paramval norming;
-  paramint s4avg;          // # of steps the sensors are averaged (1 means no averaging)
+  paramint s4avg;          // # of steps the sensors are averaged (DEBUG:1 means no averaging)
   paramint s4delay;        // # of steps the motor values are delayed (1 means no delay)
 
   int      indnorm;        ///< individual normalization (1) and global normalization (0)

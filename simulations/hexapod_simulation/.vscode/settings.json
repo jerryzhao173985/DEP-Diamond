@@ -58,5 +58,6 @@
         "mixinvector": "cpp",
         "buffered_value": "cpp",
         "random": "cpp"
-    }
+    },
+    "cmake.configureOnOpen": false
 }

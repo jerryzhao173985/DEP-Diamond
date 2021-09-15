@@ -247,6 +247,8 @@ bool log_layer = false;
 
 DiamondConf qc;   //used for storage text log file internal data
 
+// lpzrobots::Joint* robotfixator;  //fix robot in the air whenusing zero rule(rule 6)
+
 
 /// neuron transfer function
 static double g(double z)
@@ -732,6 +734,14 @@ public:
         global.configs.push_back ( diamond_controller );
         controller = diamond_controller;
 
+        if(pc.params.l1_learningrule==6 && pc.params.l2_learningrule==6){
+          // create a fixed joint to hold the robot in the air at the beginning
+          robotfixator = new lpzrobots::FixedJoint(
+              robot->getMainPrimitive(),
+              global.environment);
+          robotfixator->init(odeHandle, osgHandle, false);
+        }
+
       }else{
         assert("unknown controller");
       }
@@ -758,6 +768,9 @@ public:
         agent->setTrackOptions(trc);
       }
       if(loadcontroller){
+
+        ((OdeRobot*)robot)->place(Pos(.0, .0, 1.));
+
         if(agent->getController()->restoreFromFile(loadcontroller)){
           printf("loaded controller from %s\n", loadcontroller);
         }else{
@@ -1734,6 +1747,14 @@ public:
         diamond->get_internal_layers()[1]->setM((LC^T));  //setM(M+(LC^T));
         break;}
 
+        case 'x':{
+        if (robotfixator) {
+          std::cout << "dropping robot" << std::endl;
+          delete robotfixator;
+          robotfixator = NULL;
+        }
+        break;}
+
         case 'b':{  //increase the synboost
         Diamond* diamond = dynamic_cast<Diamond*>(global.agents[0]->getController());
         double boost = diamond->get_internal_layers()[0]->get_synboost();
@@ -1830,6 +1851,18 @@ public:
         snap.save_bmp(szFileName);
 
         break;}
+
+
+        case 'g':{
+        float grav = global.odeConfig.getParam("gravity");
+        global.odeConfig.setParam("gravity", grav+0.5);
+        break;}
+
+        case 'G':{
+        float grav = global.odeConfig.getParam("gravity");
+        global.odeConfig.setParam("gravity", grav-0.5);
+        break;}
+
 
         // case 'T':{
         // Diamond* diamond = dynamic_cast<Diamond*>(global.agents[0]->getController());
@@ -1964,6 +1997,9 @@ public:
     printf("    -period TIME_AVG \ttime-sliding window(period) for the second layer Time-loop error as input \n");
     printf("    -seed SEED \tthe terrian map seed for generation with Perlin noise\n");
   };
+
+  protected:
+    lpzrobots::Joint* robotfixator;
 
 };
 
