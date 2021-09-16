@@ -6,10 +6,10 @@
 # Parameters for Layer 1:
 l1_epsM = 0.0
 l1_epsh = 0.0
-l1_synboost = 3.5
+l1_synboost = 2.2
 l1_urate = 0.1
 l1_indnorm = 1
-l1_timedist = 4
+l1_timedist = 10
 l1_learningrule = 7
 l1_time_average = 1
 l1_Time = 50
@@ -17,10 +17,10 @@ l1_Time = 50
 # Layer 2 Parameters
 l2_epsM = 0.0
 l2_epsh = 0.0
-l2_synboost = 3.5
+l2_synboost = 2.2
 l2_urate = 0.1
 l2_indnorm = 1 
-l2_timedist = 4
+l2_timedist = 10
 l2_learningrule = 7
 l2_time_average = 1
 l2_Time = 50
