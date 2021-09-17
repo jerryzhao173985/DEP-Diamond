@@ -1252,11 +1252,12 @@ public:
     int Time_layer1 = diamond_now->get_internal_layers()[0]->get_Time();
     int Time_layer2 = diamond_now->get_internal_layers()[1]->get_Time();
     position = robot->getPosition();
-    char config_chars[150] = {0};    
-    sprintf(config_chars, "Syn:(%.1f,%.1f) T:(%d,%d), Gait(%d,%d,%d,%d,%d,%d), Ang:(%.1f,%.1f,%.1f), Bin:(%d,%d), Z: %.2f", boost_layer1, boost_layer2, Time_layer1, Time_layer2, \
-      collsion1_flag, collsion2_flag, collsion3_flag, collsion4_flag, collsion5_flag, collsion6_flag, angle_xx, angle_yy, angle_zz, bin_x, bin_y, po.z());
+    char config_chars[110] = {0};    
+    sprintf(config_chars, "Syn(%.1f,%.1f) T(%d,%d) G(%d,%d,%d,%d,%d,%d) A(%.1f,%.1f,%.1f)" //, Bin:(%d,%d), Z: %.2f" 
+      , boost_layer1, boost_layer2, Time_layer1, Time_layer2, \
+      collsion1_flag, collsion2_flag, collsion3_flag, collsion4_flag, collsion5_flag, collsion6_flag, angle_xx, angle_yy, angle_zz);  //, bin_x, bin_y, po.z()
     std::string config_string(config_chars);
-    setTitle("Cov: " + to_string(coverage) + config_string);
+    setTitle(/*"Cov: " + to_string(coverage) +*/ config_string);
 
 
 

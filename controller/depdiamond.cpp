@@ -406,14 +406,18 @@ void DEPDiamond::stepNoLearning(const sensor* x_, int number_sensors_robot,
 
   
   // 2. calculate x_derivitives MOVING averages and stored in another RingBuffer
-  if (t%10000 ==100){                                            // 100 seconds do a hard update!
-    std::cout<< "hard update on the derivitives!"<< std::endl;
-    x_derivitives_averages[t] = x_derivitives[t];
-  }else{
-    // soft update
-    double update_avg = 0.01; 
-    x_derivitives_averages[t] += (x_derivitives[t] - x_derivitives[t-2]) * update_avg;
-  }
+  // if (t%10000 ==100){                                            // 100 seconds do a hard update!
+  //   std::cout<< "hard update on the derivitives!"<< std::endl;
+  //   x_derivitives_averages[t] = x_derivitives[t];
+  // }else{
+  //   // soft update
+  //   double update_avg = 0.1; 
+  //   x_derivitives_averages[t] += (x_derivitives[t] - x_derivitives_averages[t]) * update_avg;
+  // }
+
+  // do not need hard update, initialize x_derivitives_averages to zero, the value is gradually moving
+  x_derivitives_averages[t] += (x_derivitives[t] - x_derivitives_averages[t]) * 0.1;
+
 
 
   if(_internWithLearning)
@@ -522,14 +526,17 @@ void DEPDiamond::stepNoLearningMV(const sensor* x_, int number_sensors_robot,
   x_derivitives[t] = x_buffer[t] - x_buffer[t-2];
 
   // 2. calculate x_derivitives MOVING averages and stored in another RingBuffer
-  if (t%10000 ==100){                                            // 100 seconds do a hard update!
-    std::cout<< "hard update on the derivitives!"<< std::endl;
-    x_derivitives_averages[t] = x_derivitives[t];
-  }else{
-    // soft update
-    double update_avg = 0.01; 
-    x_derivitives_averages[t] += (x_derivitives[t] - x_derivitives[t-2]) * update_avg;
-  }
+  // do not need hard update, initialize x_derivitives_averages to zero, the value is gradually moving
+  x_derivitives_averages[t] += (x_derivitives[t] - x_derivitives_averages[t]) * 0.1;
+  
+  // if (t%10000 ==100){                                            // 100 seconds do a hard update!
+  //   std::cout<< "hard update on the derivitives!"<< std::endl;
+  //   x_derivitives_averages[t] = x_derivitives[t];
+  // }else{
+  //   // soft update
+  //   double update_avg = 0.1; 
+  //   x_derivitives_averages[t] += (x_derivitives[t] - x_derivitives_averages[t]) * update_avg;
+  // }
 
 
   if(_internWithLearning)
@@ -697,38 +704,21 @@ void DEPDiamond::learnController(){
   // here in the rules we use x_derivitives_averages
   case DEPDiamondConf::DEPNEW: { // DEP with cross time mapping
 
-    // x_derivitives[t] = x_buffer[t] - x_buffer[t-2];    
-
-
-    // Matrix chi  = x_derivitives[t];
-    // v = x_derivitives[t-timedist];
-    // updateC =   M * ( chi * (v^T) );
-
-    // Matrix chis[500];
-    // Matrix vs[500];
-
-    // for(int i=0; i<Time; i++){
-    //   chis[i] = x_derivitives[t- i];
-    //   vs[i] = x_derivitives[t-timedist - i];
-    // }
-
     Matrix chi;
     chi.set(number_sensors,1);
-    // Matrix average_term;
-    // average_term.set(number_motors, number_sensors);
     Matrix MM;
-    MM.set(number_motors, number_sensors);     // M.set(number_motors, number_sensors); C.set(number_motors, number_sensors);
-    
+    MM.set(number_motors, number_sensors);         
     Matrix Lambda;
     Lambda.set(number_sensors, number_sensors);
 
+    // CHANGES: making Lambda update inside average update below
     for(int i=(t-Time); i<t; i++){ 
-      Lambda += ( ( x_derivitives[i] ) * ((x_derivitives[i])^T) ) * (1./Time);  //average vector outer product
+      Lambda += ( ( x_derivitives_averages[i-timedist] ) * ((x_derivitives_averages[i-timedist])^T) ) * (1./Time);  //average vector outer product
     }
     
     updateC.set(number_motors, number_sensors);
     
-    //using averaged derivitives here in chi and v!
+    //using averaged derivitives here in chi and v! Lambda update inside.
     for(int i=(t-Time); i<t; i++){            // 0--> T change to (t-T) --> t
       chi  = x_derivitives_averages[i];       // x_derivitives[i];          // t-i to i   //// or here it could also be i+1
       v = x_derivitives_averages[i-timedist]; // x_derivitives[i-timedist];
@@ -736,6 +726,7 @@ void DEPDiamond::learnController(){
       // Lambda = ( ( x_derivitives[i-timedist] ) * ((x_derivitives[i-timedist])^T) );
       updateC += ( ((MM * chi) * (v^T) ) * Lambda.pseudoInverse()) * (1./Time);                 // time averaged on all product
     }
+    
     // for(int i=0; i<Time; i++){ 
     //   Lambda += ( ( x_derivitives[t-timedist-i] ) * ((x_derivitives[t-timedist-i])^T) ) * (1./Time);  //average vector outer product
     // }
